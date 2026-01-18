@@ -1,12 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+	<TargetFramework>net8.0-windows</TargetFramework>
 
-    <IsPackable>false</IsPackable>
-    <IsTestProject>true</IsTestProject>
+	<ImplicitUsings>enable</ImplicitUsings>
+	<Nullable>enable</Nullable>
+	<IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,7 +16,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Charon.Input\Charon.Input.csproj" />
     <ProjectReference Include="..\Charon.Vision\Charon.Vision.csproj" />
+    <ProjectReference Include="..\Charon\Charon.csproj" />
   </ItemGroup>
 
   <ItemGroup>

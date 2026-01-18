@@ -1,14 +1,29 @@
 ﻿<Window x:Class="Charon.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Charon Debugger" Height="450" Width="800">
-    <Grid>
-        <StackPanel>
-            <Button Name="BtnTestVision" Content="Test Vision" Click="BtnTestVision_Click" Height="30"/>
+        Title="Charon Bot - Clean UI" Height="450" Width="800">
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-            <TextBlock Text="What Charon Sees:" Margin="0,10,0,0"/>
+        <StackPanel Grid.Column="0">
+            <Label Content="Controls" FontWeight="Bold" FontSize="14"/>
 
-            <Image x:Name="ImgDebugView" Width="400" Height="300" Stretch="Uniform"/>
+            <Button Name="BtnStart" Content="Start Bot" Height="30" Margin="0,5,0,5" Click="BtnStart_Click"/>
+            <Button Name="BtnStop" Content="Stop Bot" Height="30" Margin="0,0,0,10" Click="BtnStop_Click" IsEnabled="False"/>
+
+            <Label Content="Activity Log" FontWeight="Bold" Margin="0,10,0,0"/>
+            <TextBox Name="TxtLog" Height="250" 
+                     TextWrapping="Wrap" 
+                     VerticalScrollBarVisibility="Auto" 
+                     IsReadOnly="True"
+                     Background="#F0F0F0"/>
         </StackPanel>
+
+        <Border Grid.Column="1" Margin="10,0,0,0" BorderBrush="Gray" BorderThickness="1">
+            <Image Name="ImgDebugView" Stretch="Uniform"/>
+        </Border>
     </Grid>
 </Window>

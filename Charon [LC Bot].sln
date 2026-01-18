@@ -11,10 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Charon.Tests", "Charon.Test
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Charon.The.Driver", "Charon.The.Driver", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".workflows", ".workflows", "{CC2A273B-32F4-41A3-A621-9C4794C064D8}"
-	ProjectSection(SolutionItems) = preProject
-		dotnet.yml = dotnet.yml
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Charon.Input", "Charon.Input\Charon.Input.csproj", "{8D1862B4-2A16-414D-B767-6002F46801AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,6 +31,10 @@ Global
 		{A3AB225E-953B-459C-9E0C-E5C2D953C516}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3AB225E-953B-459C-9E0C-E5C2D953C516}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3AB225E-953B-459C-9E0C-E5C2D953C516}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D1862B4-2A16-414D-B767-6002F46801AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D1862B4-2A16-414D-B767-6002F46801AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D1862B4-2A16-414D-B767-6002F46801AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D1862B4-2A16-414D-B767-6002F46801AB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -41,6 +42,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{D60F82CB-20CF-44A4-B974-EDEBB42FC998} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{4AE1B202-4A41-4559-04AF-963C9B160490} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{8D1862B4-2A16-414D-B767-6002F46801AB} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DEE3CE19-E78C-4D0A-9066-4DFEDDA7B983}

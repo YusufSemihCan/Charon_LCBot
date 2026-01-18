@@ -5,21 +5,21 @@ using System.Runtime.InteropServices;
 using Emgu.CV;
 using Emgu.CV.Structure;
 
-namespace Charon
+namespace Charon.Vision
 {
-    public class VisionService
+    public class VisionService : IVisionService
     {
         [DllImport("gdi32.dll")]
-        private static extern bool BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, int dwRop);
+        private static extern bool BitBlt(nint hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, nint hdcSrc, int nXSrc, int nYSrc, int dwRop);
 
         [DllImport("user32.dll")]
-        private static extern IntPtr GetDesktopWindow();
+        private static extern nint GetDesktopWindow();
 
         [DllImport("user32.dll")]
-        private static extern IntPtr GetWindowDC(IntPtr hWnd);
+        private static extern nint GetWindowDC(nint hWnd);
 
         [DllImport("user32.dll")]
-        private static extern IntPtr ReleaseDC(IntPtr hWnd, IntPtr hDC);
+        private static extern nint ReleaseDC(nint hWnd, nint hDC);
 
         private const int SRCCOPY = 0x00CC0020;
 
@@ -54,8 +54,8 @@ namespace Charon
             // Prepare Graphics objects
             using (Graphics graph = Graphics.FromImage(bmp))
             {
-                IntPtr hdcDest = graph.GetHdc();
-                IntPtr hdcSrc = GetWindowDC(GetDesktopWindow());
+                nint hdcDest = graph.GetHdc();
+                nint hdcSrc = GetWindowDC(GetDesktopWindow());
 
                 // 3. Bit Block Transfer (The Snapshot)
                 BitBlt(hdcDest, 0, 0, rect.Width, rect.Height, hdcSrc, rect.X, rect.Y, SRCCOPY);

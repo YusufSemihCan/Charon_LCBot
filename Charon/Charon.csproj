@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Charon.Input\Charon.Input.csproj" />
     <ProjectReference Include="..\Charon.Vision\Charon.Vision.csproj" />
   </ItemGroup>
 
