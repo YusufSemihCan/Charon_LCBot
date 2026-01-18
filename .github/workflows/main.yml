@@ -1,0 +1,29 @@
+name: Charon CI
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  pull_request:
+    branches: [ "master", "main" ]
+
+jobs:
+  build:
+    runs-on: windows-latest  # Use Windows because Charon uses WPF and User32.dll
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore
+
+    - name: Test
+      # "Category!=RequiresMonitor" tells it to SKIP that specific test
+      run: dotnet test --no-build --verbosity normal --filter "Category!=RequiresMonitor"
