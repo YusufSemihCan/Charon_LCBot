@@ -8,22 +8,56 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest  # Use Windows because Charon uses WPF and User32.dll
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v3
 
+    # 1. Setup .NET
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 8.0.x
 
+    # 2. Cache NuGet Packages (SPEED BOOST)
+    - name: Cache NuGet packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.nuget/packages
+        # Key includes the OS to avoid conflicts and hash of project files
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    # 3. Restore
     - name: Restore dependencies
       run: dotnet restore
 
+    # 4. Build
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore --configuration Release
 
+    # 5. Create Tessdata Placeholder (PREVENT CRASHES)
+    # The tests look for "tessdata" folder. If your repo doesn't track it,
+    # create it here so the Locator constructor doesn't throw "DirectoryNotFound".
+    - name: Create tessdata folder
+      run: |
+        if (-not (Test-Path -Path "Charon.Tests\bin\Release\net8.0-windows\tessdata")) {
+            New-Item -ItemType Directory -Force -Path "Charon.Tests\bin\Release\net8.0-windows\tessdata"
+        }
+      shell: powershell
+
+    # 6. Test
+    # We use --no-build because we built above.
+    # We assume 'Release' configuration for performance.
     - name: Test
-      # "Category!=RequiresMonitor" tells it to SKIP that specific test
-      run: dotnet test --no-build --verbosity normal --filter "Category!=RequiresMonitor"
+      run: dotnet test --no-build --configuration Release --verbosity normal --filter "Category!=RequiresMonitor"
+
+    # 7. Upload Test Results (DEBUGGING)
+    # If tests fail, this uploads the logs/results so you can download them from GitHub.
+    - name: Upload Test Results
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: '**/TestResults/**'
