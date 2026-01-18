@@ -2,11 +2,10 @@
 using Charon.Vision;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
 using Emgu.CV;
 using Emgu.CV.Structure;
-using System.Collections; // Needed for IDictionary
-using System.Reflection;  // Needed for Reflection
+using System.Collections;
+using System.Reflection;
 
 namespace Charon.Tests
 {
@@ -107,7 +106,6 @@ namespace Charon.Tests
             Assert.Pass("LRU Cache cycled through items without crashing.");
         }
 
-        // --- NEW MEMORY TEST ---
         [Test]
         public void Dispose_ClearsInternalCaches()
         {

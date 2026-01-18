@@ -7,8 +7,8 @@ namespace Charon.Vision
     // Logic layer uses this to decide what to do next.
     public struct MatchResult
     {
-        public string Name;      // e.g., "Ruby", "TrashJunk", "EmptySlot"
-        public double Score;     // 0.0 to 1.0 (Higher is better)
+        public string Name;      // e.g., "Ruby",EmptySlot"
+        public double Score;     // 0.0 to 1.0
         public bool IsMatch;     // True if Score > Threshold
 
         // Helper for when nothing is found

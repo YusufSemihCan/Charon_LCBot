@@ -6,6 +6,11 @@ using Emgu.CV.Structure;
 
 namespace Charon.Vision
 {
+    /// <summary>
+    /// Handles Image Capture from Screen.
+    /// Has option to use Cached Buffers for improved performance.
+    /// Has option to capture Color or Grayscale images.
+    /// </summary>
     public class VisionService : IVisionService, IDisposable
     {
         private readonly Dictionary<Size, Bitmap> _bufferCache = new Dictionary<Size, Bitmap>();

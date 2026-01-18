@@ -1,66 +1,137 @@
-﻿using System.Runtime.InteropServices; // Required for 'Marshal' and 'DllImport'
-using System.Windows.Input;           // Required for 'Key' and 'KeyInterop'
+﻿using System;
+using System.Drawing;
+using System.Threading;
+using System.Runtime.InteropServices;
+using Charon.Vision;
+using static Charon.Input.NativeMethods;
 
 namespace Charon.Input
 {
     public class InputService : IInputService
     {
-        private readonly Random _random = new Random();
+        private readonly Random _rng = new Random();
+        private readonly IVisionService _vision;
 
-        public void Click(int x, int y)
+        public InputService(IVisionService vision)
         {
-            // 1. Get Screen Resolution dynamically
-            // 0 = SM_CXSCREEN (Width), 1 = SM_CYSCREEN (Height)
-            int screenWidth = NativeMethods.GetSystemMetrics(0);
-            int screenHeight = NativeMethods.GetSystemMetrics(1);
-
-            // 2. Convert pixels to "Absolute" coordinates (0 to 65535)
-            int absX = (x * 65535) / screenWidth;
-            int absY = (y * 65535) / screenHeight;
-
-            // 3. Define the inputs: Move, Down, Up
-            NativeMethods.INPUT[] inputs = new NativeMethods.INPUT[3];
-
-            // Move
-            inputs[0].type = NativeMethods.INPUT_MOUSE;
-            inputs[0].U.mi.dx = absX;
-            inputs[0].U.mi.dy = absY;
-            inputs[0].U.mi.dwFlags = NativeMethods.MOUSEEVENTF_MOVE | NativeMethods.MOUSEEVENTF_ABSOLUTE;
-
-            // Click Down
-            inputs[1].type = NativeMethods.INPUT_MOUSE;
-            inputs[1].U.mi.dwFlags = NativeMethods.MOUSEEVENTF_LEFTDOWN;
-
-            // Click Up
-            inputs[2].type = NativeMethods.INPUT_MOUSE;
-            inputs[2].U.mi.dwFlags = NativeMethods.MOUSEEVENTF_LEFTUP;
-
-            // 4. Send the command
-            NativeMethods.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(NativeMethods.INPUT)));
-
-            // Add a tiny random delay to feel human
-            Thread.Sleep(_random.Next(20, 50));
+            _vision = vision;
         }
 
-        public void PressKey(Key key)
+        public void MoveMouse(Point dest, bool humanLike = true)
         {
-            // Convert WPF Key to Virtual Key Code
-            ushort virtualKey = (ushort)KeyInterop.VirtualKeyFromKey(key);
+            if (!humanLike)
+            {
+                // Instant teleport using virtual desktop flags
+                SendMouseInput(dest.X, dest.Y, MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_VIRTUALDESK);
+                return;
+            }
 
-            NativeMethods.INPUT[] inputs = new NativeMethods.INPUT[2];
+            GetCursorPos(out POINT start);
+            Point pStart = new Point(start.X, start.Y);
 
-            // Key Down
-            inputs[0].type = NativeMethods.INPUT_KEYBOARD;
-            inputs[0].U.ki.wVk = virtualKey;
+            // Generate random control points for a natural human-like curve
+            Point c1 = new Point(pStart.X + _rng.Next(-100, 100), pStart.Y + _rng.Next(-100, 100));
+            Point c2 = new Point(dest.X + _rng.Next(-100, 100), dest.Y + _rng.Next(-100, 100));
 
-            // Key Up
-            inputs[1].type = NativeMethods.INPUT_KEYBOARD;
-            inputs[1].U.ki.wVk = virtualKey;
-            inputs[1].U.ki.dwFlags = NativeMethods.KEYEVENTF_KEYUP;
+            int steps = _rng.Next(10, 25);
+            for (int i = 1; i <= steps; i++)
+            {
+                double t = i / (double)steps;
+                Point pos = CalculateBezierPoint(t, pStart, c1, c2, dest);
+                SendMouseInput(pos.X, pos.Y, MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_VIRTUALDESK);
+                Thread.Sleep(_rng.Next(5, 15)); // Micro-jitter
+            }
+        }
 
-            NativeMethods.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(NativeMethods.INPUT)));
+        public void Drag(Point start, Point end, bool humanLike = true)
+        {
+            MoveMouse(start, humanLike);
+            SendMouseAction(MOUSEEVENTF_LEFTDOWN);
+            Thread.Sleep(_rng.Next(100, 200));
 
-            Thread.Sleep(_random.Next(30, 60));
+            MoveMouse(end, humanLike);
+            Thread.Sleep(_rng.Next(100, 200));
+            SendMouseAction(MOUSEEVENTF_LEFTUP);
+        }
+
+        public void Scroll(int amount, bool humanLike = true)
+        {
+            var input = CreateMouseInput(0, 0, MOUSEEVENTF_WHEEL);
+            input.mi.mouseData = (uint)amount;
+            SendInput(1, new[] { input }, Marshal.SizeOf(typeof(INPUT)));
+        }
+
+        public void LeftClick(bool humanLike = true)
+        {
+            SendMouseAction(MOUSEEVENTF_LEFTDOWN);
+            if (humanLike) Thread.Sleep(_rng.Next(50, 100));
+            SendMouseAction(MOUSEEVENTF_LEFTUP);
+        }
+
+        public void RightClick(bool humanLike = true)
+        {
+            SendMouseAction(MOUSEEVENTF_RIGHTDOWN);
+            if (humanLike) Thread.Sleep(_rng.Next(50, 100));
+            SendMouseAction(MOUSEEVENTF_RIGHTUP);
+        }
+
+        public void PressKey(VirtualKey key, bool humanLike = true)
+        {
+            SendKeyInput((ushort)key, 0); // Down
+            if (humanLike) Thread.Sleep(_rng.Next(50, 100));
+            SendKeyInput((ushort)key, KEYEVENTF_KEYUP); // Up
+        }
+
+        // =========================================================
+        // MULTI-MONITOR COORDINATE CALCULATIONS
+        // =========================================================
+
+        private void SendMouseInput(int x, int y, uint flags)
+        {
+            // Get the entire Virtual Desktop metrics to handle negative coordinates (left-side monitors)
+            int vLeft = GetSystemMetrics(SM_XVIRTUALSCREEN);
+            int vTop = GetSystemMetrics(SM_YVIRTUALSCREEN);
+            int vWidth = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+            int vHeight = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+
+            // Normalize coordinates to the 0-65535 range required by Windows SendInput
+            int absX = ((x - vLeft) * 65536) / vWidth;
+            int absY = ((y - vTop) * 65536) / vHeight;
+
+            var input = CreateMouseInput(absX, absY, flags);
+            SendInput(1, new[] { input }, Marshal.SizeOf(typeof(INPUT)));
+        }
+
+        private void SendMouseAction(uint flags)
+        {
+            var input = CreateMouseInput(0, 0, flags);
+            SendInput(1, new[] { input }, Marshal.SizeOf(typeof(INPUT)));
+        }
+
+        private void SendKeyInput(ushort vk, uint flags)
+        {
+            var input = new INPUT { type = INPUT_KEYBOARD };
+            input.ki.wVk = vk;
+            input.ki.dwFlags = flags;
+            SendInput(1, new[] { input }, Marshal.SizeOf(typeof(INPUT)));
+        }
+
+        private INPUT CreateMouseInput(int x, int y, uint flags)
+        {
+            return new INPUT
+            {
+                type = INPUT_MOUSE,
+                mi = new MOUSEINPUT { dx = x, dy = y, dwFlags = flags }
+            };
+        }
+
+        private Point CalculateBezierPoint(double t, Point p0, Point p1, Point p2, Point p3)
+        {
+            // Cubic Bezier Formula
+            double invT = 1 - t;
+            int x = (int)(Math.Pow(invT, 3) * p0.X + 3 * Math.Pow(invT, 2) * t * p1.X + 3 * invT * Math.Pow(t, 2) * p2.X + Math.Pow(t, 3) * p3.X);
+            int y = (int)(Math.Pow(invT, 3) * p0.Y + 3 * Math.Pow(invT, 2) * t * p1.Y + 3 * invT * Math.Pow(t, 2) * p2.Y + Math.Pow(t, 3) * p3.Y);
+            return new Point(x, y);
         }
     }
 }

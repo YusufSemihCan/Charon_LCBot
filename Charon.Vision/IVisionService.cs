@@ -6,6 +6,8 @@ namespace Charon.Vision
 {
     public interface IVisionService
     {
+        Rectangle ScreenResolution { get; }
+
         // 1. Update CaptureRegion to include the optional 'useCache' parameter.
         // We set the default to 'false' here too, so the bot knows it's optional.
         Image<Bgr, byte> CaptureRegion(Rectangle region, bool useCache = false);

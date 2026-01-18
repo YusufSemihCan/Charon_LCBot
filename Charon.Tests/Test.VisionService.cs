@@ -3,8 +3,7 @@ using Charon.Vision;
 using System.Drawing;
 using Emgu.CV;
 using Emgu.CV.Structure;
-using System.Collections.Generic;
-using System.Reflection; // Needed for the Dispose check
+using System.Reflection;
 
 namespace Charon.Tests
 {
@@ -64,8 +63,6 @@ namespace Charon.Tests
                 Assert.That(img2.Width, Is.EqualTo(100));
             }
         }
-
-        // --- NEW MEMORY TESTS ---
 
         [Test]
         public void Dispose_ClearsBufferCache()

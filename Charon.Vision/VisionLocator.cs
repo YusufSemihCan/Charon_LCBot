@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Linq;
+﻿using System.Drawing;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
@@ -11,9 +7,8 @@ using Tesseract;
 namespace Charon.Vision
 {
     /// <summary>
-    /// The "Eyes" of the bot. 
     /// Handles finding images (Pattern Matching) and reading text (OCR).
-    /// Manages its own memory using a Smart Cache system (Speed vs Memory vs Balanced).
+    /// Manages its own memory using a Cache system (Speed vs Memory vs Balanced).
     /// </summary>
     public class VisionLocator : IVisionLocator, IDisposable
     {

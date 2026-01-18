@@ -1,37 +1,33 @@
-﻿using System.Runtime.InteropServices; // Required for 'Marshal' and 'DllImport'
-using System.Windows.Input;           // Required for 'Key' and 'KeyInterop'
+﻿using System.Runtime.InteropServices;
 
 namespace Charon.Input
 {
-    // This class wraps the raw Windows API calls.
     internal static class NativeMethods
     {
-        // CONSTANTS needed for the inputs
-        public const int INPUT_MOUSE = 0;
-        public const int INPUT_KEYBOARD = 1;
-        public const uint KEYEVENTF_KEYUP = 0x0002;
-        public const uint MOUSEEVENTF_MOVE = 0x0001;
-        public const uint MOUSEEVENTF_ABSOLUTE = 0x8000;
-        public const uint MOUSEEVENTF_LEFTDOWN = 0x0002;
-        public const uint MOUSEEVENTF_LEFTUP = 0x0004;
+        [DllImport("user32.dll", SetLastError = true)] internal static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
+        [DllImport("user32.dll")] internal static extern bool GetCursorPos(out POINT lpPoint);
 
-        // The main structure Windows expects for an Input event
+        // System Metrics for Virtual Screen
+        internal const uint MOUSEEVENTF_VIRTUALDESK = 0x4000; // Maps coordinates to the entire desktop
+        internal const int SM_XVIRTUALSCREEN = 76;
+        internal const int SM_YVIRTUALSCREEN = 77;
+        internal const int SM_CXVIRTUALSCREEN = 78;
+        internal const int SM_CYVIRTUALSCREEN = 79;
+        [DllImport("user32.dll")] internal static extern int GetSystemMetrics(int nIndex);
+
         [StructLayout(LayoutKind.Sequential)]
-        public struct INPUT
-        {
-            public uint type;
-            public InputUnion U;
-        }
+        internal struct POINT { public int X; public int Y; }
 
         [StructLayout(LayoutKind.Explicit)]
-        public struct InputUnion
+        internal struct INPUT
         {
-            [FieldOffset(0)] public MOUSEINPUT mi;
-            [FieldOffset(0)] public KEYBDINPUT ki;
+            [FieldOffset(0)] public uint type;
+            [FieldOffset(8)] public MOUSEINPUT mi;
+            [FieldOffset(8)] public KEYBDINPUT ki;
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        public struct MOUSEINPUT
+        internal struct MOUSEINPUT
         {
             public int dx;
             public int dy;
@@ -42,7 +38,7 @@ namespace Charon.Input
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        public struct KEYBDINPUT
+        internal struct KEYBDINPUT
         {
             public ushort wVk;
             public ushort wScan;
@@ -51,12 +47,18 @@ namespace Charon.Input
             public IntPtr dwExtraInfo;
         }
 
-        // The function that actually sends the input to the OS
-        [DllImport("user32.dll", SetLastError = true)]
-        public static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
+        // Mouse Flags
+        internal const uint INPUT_MOUSE = 0;
+        internal const uint MOUSEEVENTF_MOVE = 0x0001;
+        internal const uint MOUSEEVENTF_LEFTDOWN = 0x0002;
+        internal const uint MOUSEEVENTF_LEFTUP = 0x0004;
+        internal const uint MOUSEEVENTF_RIGHTDOWN = 0x0008;
+        internal const uint MOUSEEVENTF_RIGHTUP = 0x0010;
+        internal const uint MOUSEEVENTF_WHEEL = 0x0800;
+        internal const uint MOUSEEVENTF_ABSOLUTE = 0x8000;
 
-        // Function to get screen size (for coordinate calculation)
-        [DllImport("user32.dll")]
-        public static extern int GetSystemMetrics(int nIndex);
+        // Keyboard Flags
+        internal const uint INPUT_KEYBOARD = 1;
+        internal const uint KEYEVENTF_KEYUP = 0x0002;
     }
 }

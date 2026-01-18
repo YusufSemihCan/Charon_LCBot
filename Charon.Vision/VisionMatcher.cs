@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using Emgu.CV;
+﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 
 namespace Charon.Vision
 {
+    /// <summary>
+    /// Handles image matching and OCR functionality.
+    /// Has option to classify Color or Grayscale images.
+    /// </summary>
     public class VisionMatcher : IVisionMatcher, IDisposable
     {
         // DUAL DATABASE: Stores both Color and Gray versions to avoid runtime conversion lag.
@@ -64,7 +64,7 @@ namespace Charon.Vision
             return new MatchResult { Name = bestMatchName, Score = bestMatchScore, IsMatch = bestMatchScore >= threshold };
         }
 
-        // CLASSIFY (GRAY) - NOW BLAZING FAST
+        // CLASSIFY (GRAY)
         public MatchResult Classify(Image<Gray, byte> itemImage, double threshold = 0.85)
         {
             string bestMatchName = "Unknown";

@@ -2,11 +2,10 @@
 using Charon.Vision;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
 using Emgu.CV;
 using Emgu.CV.Structure;
-using System.Collections; // Needed for IDictionary
-using System.Reflection;  // Needed for Reflection
+using System.Collections;
+using System.Reflection;
 
 namespace Charon.Tests
 {
@@ -84,16 +83,11 @@ namespace Charon.Tests
             }
         }
 
-        // --- NEW MEMORY TEST ---
         [Test]
         public void Dispose_ClearsLibrary()
         {
-            // 1. Arrange (Setup has already loaded the library)
-
-            // 2. Act
             _matcher.Dispose();
 
-            // 3. Assert
             var libField = typeof(VisionMatcher).GetField("_libraryColor", BindingFlags.NonPublic | BindingFlags.Instance);
             var library = libField?.GetValue(_matcher) as IDictionary;
 
