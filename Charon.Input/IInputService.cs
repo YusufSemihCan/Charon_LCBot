@@ -10,7 +10,6 @@ namespace Charon.Input
 
         /// <summary>
         /// Moves the mouse to the target coordinates.
-        /// </summary>
         /// <param name="destination">Target X,Y on screen.</param>
         /// <param name="humanLike">
         /// If TRUE: Uses Bezier curves and variable speed (Stealth).
@@ -18,9 +17,7 @@ namespace Charon.Input
         /// </param>
         void MoveMouse(Point destination, bool humanLike = true);
 
-        /// <summary>
         /// Moves mouse to start, holds left click, moves to end, releases.
-        /// </summary>
         void Drag(Point start, Point end, bool humanLike = true);
 
         /// <summary>
@@ -33,23 +30,20 @@ namespace Charon.Input
         // CLICKS
         // =========================================================
 
-        /// <summary>
-        /// Left Click (Down + Delay + Up).
-        /// </summary>
+        // Left Click (Down + Delay + Up).
         void LeftClick(bool humanLike = true);
 
-        /// <summary>
-        /// Right Click (Down + Delay + Up).
-        /// </summary>
+        // Right Click (Down + Delay + Up).
         void RightClick(bool humanLike = true);
 
         // =========================================================
         // KEYBOARD
         // =========================================================
 
-        /// <summary>
-        /// Presses a key (Down + Delay + Up).
-        /// </summary>
+        // Presses a key (Down + Delay + Up).
         void PressKey(VirtualKey key, bool humanLike = true);
+
+        // Checks if the mouse is in a "Fail-Safe" position (top-left corner).
+        bool CheckFailSafe();
     }
 }

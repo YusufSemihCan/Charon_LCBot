@@ -7,6 +7,10 @@ using static Charon.Input.NativeMethods;
 
 namespace Charon.Input
 {
+    /// <summary>
+    /// Handles Mouse and Keyboard Input Simulation.
+    /// Has options for Human-Like movement (Bezier curves, variable speed).
+    /// </summary>
     public class InputService : IInputService
     {
         private readonly Random _rng = new Random();
@@ -17,11 +21,26 @@ namespace Charon.Input
             _vision = vision;
         }
 
+        /// <summary>
+        /// Throws an exception if the mouse is at (0,0).
+        /// Call this at the start of every major input action.
+        /// </summary>
+        public bool CheckFailSafe()
+        {
+            GetCursorPos(out POINT pos);
+            if (pos.X == 0 && pos.Y == 0)
+            {
+                throw new OperationCanceledException("Fail-safe triggered: Mouse moved to corner.");
+            }
+            return false;
+        }
+
         public void MoveMouse(Point dest, bool humanLike = true)
         {
+            CheckFailSafe(); // SAFETY CHECK
+
             if (!humanLike)
             {
-                // Instant teleport using virtual desktop flags
                 SendMouseInput(dest.X, dest.Y, MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_VIRTUALDESK);
                 return;
             }
@@ -29,17 +48,19 @@ namespace Charon.Input
             GetCursorPos(out POINT start);
             Point pStart = new Point(start.X, start.Y);
 
-            // Generate random control points for a natural human-like curve
             Point c1 = new Point(pStart.X + _rng.Next(-100, 100), pStart.Y + _rng.Next(-100, 100));
             Point c2 = new Point(dest.X + _rng.Next(-100, 100), dest.Y + _rng.Next(-100, 100));
 
             int steps = _rng.Next(10, 25);
             for (int i = 1; i <= steps; i++)
             {
+                // Re-check safety during long movements
+                if (i % 5 == 0) CheckFailSafe();
+
                 double t = i / (double)steps;
                 Point pos = CalculateBezierPoint(t, pStart, c1, c2, dest);
                 SendMouseInput(pos.X, pos.Y, MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_VIRTUALDESK);
-                Thread.Sleep(_rng.Next(5, 15)); // Micro-jitter
+                Thread.Sleep(_rng.Next(5, 15));
             }
         }
 
@@ -63,6 +84,7 @@ namespace Charon.Input
 
         public void LeftClick(bool humanLike = true)
         {
+            CheckFailSafe(); // SAFETY CHECK
             SendMouseAction(MOUSEEVENTF_LEFTDOWN);
             if (humanLike) Thread.Sleep(_rng.Next(50, 100));
             SendMouseAction(MOUSEEVENTF_LEFTUP);
