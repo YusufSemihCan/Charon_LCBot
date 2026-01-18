@@ -3,6 +3,8 @@ using Charon.Vision;
 using System.Drawing;
 using Emgu.CV;
 using Emgu.CV.Structure;
+using System.Collections.Generic;
+using System.Reflection; // Needed for the Dispose check
 
 namespace Charon.Tests
 {
@@ -61,6 +63,33 @@ namespace Charon.Tests
                 Assert.That(img2, Is.Not.Null);
                 Assert.That(img2.Width, Is.EqualTo(100));
             }
+        }
+
+        // --- NEW MEMORY TESTS ---
+
+        [Test]
+        public void Dispose_ClearsBufferCache()
+        {
+            // 1. Arrange: Fill the cache
+            Rectangle region = new Rectangle(0, 0, 100, 100);
+            _service.CaptureRegion(region, useCache: true);
+
+            // 2. Act: Dispose the service
+            _service.Dispose();
+
+            // 3. Assert: Use Reflection to look inside private '_bufferCache'
+            var fieldInfo = typeof(VisionService).GetField("_bufferCache", BindingFlags.NonPublic | BindingFlags.Instance);
+            var cache = fieldInfo?.GetValue(_service) as Dictionary<Size, Bitmap>;
+
+            Assert.That(cache, Is.Not.Null);
+            Assert.That(cache!.Count, Is.EqualTo(0), "Buffer cache should be empty after Dispose!");
+        }
+
+        [Test]
+        public void Dispose_CanBeCalledTwice_WithoutCrashing()
+        {
+            _service.Dispose();
+            Assert.DoesNotThrow(() => _service.Dispose());
         }
     }
 }
