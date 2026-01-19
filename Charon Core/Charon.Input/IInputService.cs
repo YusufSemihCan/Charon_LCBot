@@ -24,7 +24,9 @@ namespace Charon.Input
 
         // KEYBOARD
         /// Presses a virtual key (down, delay, up).
-        void PressKey(VirtualKey key);
+        /// <param name="key">The VirtualKey to press.</param>
+        /// <param name="holdTime">Duration in milliseconds to keep the key pressed.</param>
+        void PressKey(VirtualKey key, int holdTime = 50);
 
         // UTILITY & SAFETY
         /// Checks if the mouse is in the fail-safe position (0,0).

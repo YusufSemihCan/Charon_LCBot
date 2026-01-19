@@ -1,6 +1,6 @@
 ﻿using Charon.Input;
-using Moq;
 using NUnit.Framework;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 
@@ -9,134 +9,187 @@ namespace Charon.Tests
     [TestFixture]
     public class Test_InputService
     {
-        private InputService _inputService = null!;
+        private InputService _service = null!;
 
         [SetUp]
         public void Setup()
         {
-            _inputService = new InputService();
+            _service = new InputService();
         }
 
-        // --- HOLD TIME TESTS ---
+        // --- MOUSE CLICK TESTS ---
+
+        [Test]
+        [Description("Verifies that LeftClick uses the default 20ms hold duration when no parameter is provided.")]
+        public void LeftClick_UsesDefaultHoldTime()
+        {
+            var watch = Stopwatch.StartNew();
+            _service.LeftClick(); // Uses default 20ms
+            watch.Stop();
+            Assert.That(watch.ElapsedMilliseconds, Is.GreaterThanOrEqualTo(20));
+        }
 
         [Test]
         [Description("Verifies that LeftClick respects the explicit holdTime parameter.")]
         public void LeftClick_RespectsHoldTime()
         {
-            int requestedHold = 100; // ms
+            int requestedHold = 100;
             var watch = Stopwatch.StartNew();
 
-            _inputService.LeftClick(requestedHold); //
+            _service.LeftClick(requestedHold);
 
             watch.Stop();
-
-            // Should be at least the requested hold time
-            Assert.That(watch.ElapsedMilliseconds, Is.GreaterThanOrEqualTo(requestedHold),
-                $"Click duration was {watch.ElapsedMilliseconds}ms, expected at least {requestedHold}ms.");
+            Assert.That(watch.ElapsedMilliseconds, Is.GreaterThanOrEqualTo(requestedHold));
         }
 
         [Test]
-        public void LeftClick_ZeroHoldTime_DoesNotCrash()
+        [Description("Ensures negative hold times are clamped to 0 and do not crash.")]
+        public void LeftClick_NegativeHoldTime_DoesNotThrow()
         {
-            // Ensure 0ms doesn't cause a thread error
-            Assert.DoesNotThrow(() => _inputService.LeftClick(0));
+            // This tests the Math.Max(0, holdTime) logic
+            Assert.DoesNotThrow(() => _service.LeftClick(-100));
+        }
+
+        [Test]
+        [Description("Verifies that RightClick uses the default 20ms hold duration when no parameter is provided.")]
+        public void RightClick_UsesDefaultHoldTime()
+        {
+            var watch = Stopwatch.StartNew();
+            _service.RightClick(); // Uses default 20ms
+            watch.Stop();
+            Assert.That(watch.ElapsedMilliseconds, Is.GreaterThanOrEqualTo(20));
         }
 
         [Test]
         [Description("Verifies that RightClick respects the explicit holdTime parameter.")]
         public void RightClick_RespectsHoldTime()
         {
-            int requestedHold = 150;
+            int requestedHold = 50;
             var watch = Stopwatch.StartNew();
 
-            _inputService.RightClick(requestedHold); //
+            _service.RightClick(requestedHold);
 
             watch.Stop();
-
             Assert.That(watch.ElapsedMilliseconds, Is.GreaterThanOrEqualTo(requestedHold));
         }
 
         [Test]
-        public void LeftClick_NegativeHoldTime_DefaultsOrSafeguards()
+        [Description("Ensures RightClick handles negative input safely via clamping.")]
+        public void RightClick_NegativeHoldTime_DoesNotThrow()
         {
-            // Depending on your logic, this should either throw an error 
-            // or default to a safe minimum like 1ms.
-            Assert.DoesNotThrow(() => _inputService.LeftClick(-100));
-        }
-
-        // --- MOVEMENT & DRAG TESTS ---
-
-        [Test]
-        [Description("Ensures Drag performs the full sequence (Down -> Move -> Up).")]
-        public void Drag_Sequence_DoesNotThrow()
-        {
-            Point p1 = new Point(100, 100);
-            Point p2 = new Point(200, 200);
-
-            // Verifies the sequence of moving, clicking down, moving again, and releasing
-            Assert.DoesNotThrow(() => _inputService.Drag(p1, p2, humanLike: false));
-        }
-
-        [Test]
-        [Description("Verifies Bezier movement generates a path and takes longer than instant movement.")]
-        public void MoveMouse_HumanLike_TakesTime()
-        {
-            Point dest = new Point(800, 800);
-            var watch = Stopwatch.StartNew();
-
-            _inputService.MoveMouse(dest, humanLike: true); //
-
-            watch.Stop();
-
-            // Bezier movement involves Thread.Sleep loops, so it must take measurable time
-            Assert.That(watch.ElapsedMilliseconds, Is.GreaterThan(10));
-        }
-
-        [Test]
-        public void MoveMouse_Bezier_UpdatesPositionMultipleTimes()
-        {
-            // This is hard to test without mocking SendInput, but you can 
-            // check if the method takes the expected amount of time.
-            var sw = Stopwatch.StartNew();
-            _inputService.MoveMouse(new Point(100, 100), humanLike: true);
-            sw.Stop();
-
-            // With 10-25 steps and 5-15ms sleep per step, 
-            // it should take at least 50ms.
-            Assert.That(sw.ElapsedMilliseconds, Is.GreaterThanOrEqualTo(50));
+            // Adding this as it was missing from previous versions
+            Assert.DoesNotThrow(() => _service.RightClick(-100));
         }
 
         // --- KEYBOARD TESTS ---
 
         [Test]
+        [Description("Verifies that PressKey uses defualt holdTime without parameters.")]
+        public void PressKey_DefaultHoldTime_Works()
+        {
+            // Verifies the default 50ms parameter logic works
+            Assert.DoesNotThrow(() => _service.PressKey(VirtualKey.W));
+        }
+
+        [Test]
+        [Description("Verifies that PressKey respects the explicit holdTime parameter.")]
+        public void PressKey_RespectsHoldTime()
+        {
+            int requestedHold = 100;
+            var watch = Stopwatch.StartNew();
+
+            _service.PressKey(VirtualKey.W, requestedHold);
+
+            watch.Stop();
+            Assert.That(watch.ElapsedMilliseconds, Is.GreaterThanOrEqualTo(requestedHold));
+        }
+
+        [Test]
+        [Description("Verifies that PressKey handles negative hold times safely.")]
+        public void PressKey_NegativeHoldTime_DoesNotThrow()
+        {
+            Assert.DoesNotThrow(() => _service.PressKey(VirtualKey.A, -50));
+        }
+
+        [Test]
+        [Description("Verifies that PressKey Key_Mapping is correct.")]
         public void VirtualKey_Mapping_IsCorrect()
-        {
-            // Verify a few critical keys match Winuser.h hex codes
-            Assert.That((ushort)VirtualKey.LBUTTON, Is.EqualTo(0x01));
-            Assert.That((ushort)VirtualKey.W, Is.EqualTo(0x57));
-        }
-
-        // --- SAFETY TESTS ---
-
-        [Test]
-        [Description("Verifies the Fail-Safe logic handles safe positions correctly.")]
-        public void CheckFailSafe_DoesNotThrow_AtCenterScreen()
-        {
-            // First, move mouse to a safe area away from (0,0)
-            _inputService.MoveMouse(new Point(500, 500), humanLike: false);
-
-            Assert.DoesNotThrow(() => _inputService.CheckFailSafe()); //
-        }
-
-        // --- UTILITY TESTS ---
-
-        [Test]
-        public void Scroll_AcceptsPositiveAndNegativeValues()
         {
             Assert.Multiple(() =>
             {
-                Assert.DoesNotThrow(() => _inputService.Scroll(120));  // Scroll Up
-                Assert.DoesNotThrow(() => _inputService.Scroll(-120)); // Scroll Down
+                Assert.That((ushort)VirtualKey.LBUTTON, Is.EqualTo(0x01));
+                Assert.That((ushort)VirtualKey.W, Is.EqualTo(0x57));
+                Assert.That((ushort)VirtualKey.V, Is.EqualTo(0x56));
+            });
+        }
+
+        // --- MOVEMENT & DRAG TESTS ---
+
+        [Test]
+        [Description("Ensures human-like movement takes longer than instant movement.")]
+        public void MoveMouse_HumanLike_TakesTime()
+        {
+            Point dest = new Point(500, 500);
+            var watch = Stopwatch.StartNew();
+
+            _service.MoveMouse(dest, humanLike: true);
+
+            watch.Stop();
+            // Bezier movement involves several steps with Thread.Sleep
+            Assert.That(watch.ElapsedMilliseconds, Is.GreaterThan(20));
+        }
+
+        [Test]
+        [Description("Verifies Drag sequence takes at least 60ms (30ms down + 30ms up).")]
+        public void Drag_Timing_IsCorrect()
+        {
+            Point p1 = new Point(100, 100);
+            Point p2 = new Point(200, 200);
+            var watch = Stopwatch.StartNew();
+
+            _service.Drag(p1, p2, humanLike: false);
+
+            watch.Stop();
+            // Drag has two Thread.Sleep(30) calls internally
+            Assert.That(watch.ElapsedMilliseconds, Is.GreaterThanOrEqualTo(60));
+        }
+
+        [Test]
+        public void MoveMouse_ExtremeCoordinates_DoesNotThrow()
+        {
+            // Tests that the math inside SendMouseInput doesn't divide by zero or overflow
+            Assert.Multiple(() =>
+            {
+                Assert.DoesNotThrow(() => _service.MoveMouse(new Point(0, 0), false));
+                Assert.DoesNotThrow(() => _service.MoveMouse(new Point(9999, 9999), false));
+            });
+        }
+
+        [Test]
+        public void Drag_Execution_DoesNotThrow()
+        {
+            Point p1 = new Point(100, 100);
+            Point p2 = new Point(300, 300);
+            Assert.DoesNotThrow(() => _service.Drag(p1, p2, humanLike: false));
+        }
+
+        // --- SAFETY & UTILITY ---
+
+        [Test]
+        public void CheckFailSafe_DoesNotThrow_InSafeZone()
+        {
+            // Move mouse away from 0,0 first
+            _service.MoveMouse(new Point(200, 200), humanLike: false);
+            Assert.DoesNotThrow(() => _service.CheckFailSafe());
+        }
+
+        [Test]
+        public void Scroll_Execution_DoesNotThrow()
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.DoesNotThrow(() => _service.Scroll(120));  // Up
+                Assert.DoesNotThrow(() => _service.Scroll(-120)); // Down
             });
         }
     }

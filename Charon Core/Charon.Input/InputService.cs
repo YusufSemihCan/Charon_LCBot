@@ -101,12 +101,16 @@ namespace Charon.Input
         }
 
         // 5. KEYBOARD
-        public void PressKey(VirtualKey key)
+        public void PressKey(VirtualKey key, int holdTime = 50)
         {
             CheckFailSafe();
-            SendKeyInput((ushort)key, 0); // Down
-            Thread.Sleep(_rng.Next(50, 100));
-            SendKeyInput((ushort)key, KEYEVENTF_KEYUP); // Up
+
+            // Ensure holdTime is never less than 0 to avoid Thread.Sleep crashes
+            int actualHold = Math.Max(0, holdTime);
+
+            SendKeyInput((ushort)key, KEYEVENTF_KEYDOWN); // Down
+            Thread.Sleep(actualHold);
+            SendKeyInput((ushort)key, KEYEVENTF_KEYUP);   // Up
         }
 
         // Private Calculations
