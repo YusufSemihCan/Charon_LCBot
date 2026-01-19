@@ -91,6 +91,17 @@ namespace Charon.Tests
             VerifyFind(useEdges: true);
         }
 
+        [Test]
+        [Description("Verifies that looking for a non-existent template returns Rectangle.Empty.")]
+        public void Find_ReturnsEmpty_WhenTemplateMissing()
+        {
+            using (var dummy = new Image<Gray, byte>(100, 100))
+            {
+                Rectangle result = _locator.Find(dummy, "NonExistentTemplate");
+                Assert.That(result, Is.EqualTo(Rectangle.Empty));
+            }
+        }
+
         private void VerifyFind(bool useEdges)
         {
             using (Bitmap screenBmp = new Bitmap(100, 100))

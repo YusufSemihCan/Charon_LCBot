@@ -150,6 +150,28 @@ namespace Charon.Tests
         }
 
         [Test]
+        [Description("Verifies that the mouse actually moves to the target coordinates.")]
+        public void MoveMouse_ActuallyMovesCursor()
+        {
+            Point target = new Point(500, 500);
+            _service.MoveMouse(target, humanLike: false);
+
+            GetCursorPos(out POINT pos);
+            Assert.That(pos.X, Is.EqualTo(target.X).Within(1), "Mouse X position incorrect");
+            Assert.That(pos.Y, Is.EqualTo(target.Y).Within(1), "Mouse Y position incorrect");
+        }
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool GetCursorPos(out POINT lpPoint);
+
+        [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+        private struct POINT
+        {
+            public int X;
+            public int Y;
+        }
+
+        [Test]
         [Description("Verifies Drag sequence takes at least 60ms (30ms down + 30ms up).")]
         public void Drag_Timing_IsCorrect()
         {
