@@ -48,7 +48,7 @@ namespace Charon.Tests
 
         [Test]
         [Description("Verifies the cache logic. Reusing buffers is critical for preventing GC stuttering in bots.")]
-waw        public void Capture_Cache_ReusesInternalBitmaps()
+        public void Capture_Cache_ReusesInternalBitmaps()
         {
             var region = new Rectangle(0, 0, 100, 100);
 

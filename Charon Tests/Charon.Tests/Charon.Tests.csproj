@@ -22,6 +22,15 @@
 	  <ProjectReference Include="..\..\Charon Core\Charon\Charon.csproj" />
 	</ItemGroup>
 
+	  <ItemGroup>
+    <None Update="TestAssets\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="tessdata\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 	<ItemGroup>
 		<None Update="Test Assets\Test_Image.png">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
