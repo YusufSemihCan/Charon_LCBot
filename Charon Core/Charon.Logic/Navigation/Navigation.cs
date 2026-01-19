@@ -3,11 +3,14 @@ using Charon.Vision;
 using System.Threading;
 using System;
 
+using Charon.Logic.Combat;
+
 namespace Charon.Logic.Navigation
 {
     public class Navigation : INavigation
     {
         private readonly INavigationClicker _clicker;
+        private readonly ICombatClicker _combat;
         private readonly IVisionService _vision;
         private readonly IVisionLocator _locator;
         private readonly IInputService _input;
@@ -15,9 +18,10 @@ namespace Charon.Logic.Navigation
 
         public NavigationState CurrentState => _currentState;
 
-        public Navigation(INavigationClicker clicker, IVisionService vision, IVisionLocator locator, IInputService input)
+        public Navigation(INavigationClicker clicker, ICombatClicker combat, IVisionService vision, IVisionLocator locator, IInputService input)
         {
             _clicker = clicker ?? throw new ArgumentNullException(nameof(clicker));
+            _combat = combat ?? throw new ArgumentNullException(nameof(combat));
             _vision = vision ?? throw new ArgumentNullException(nameof(vision));
             _locator = locator ?? throw new ArgumentNullException(nameof(locator));
             _input = input ?? throw new ArgumentNullException(nameof(input));

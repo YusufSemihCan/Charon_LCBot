@@ -1,5 +1,6 @@
 ﻿using Charon.Input;
 using Charon.Logic.Navigation;
+using Charon.Logic.Combat;
 using Charon.Vision;
 
 public class BotBootstrapper
@@ -17,8 +18,9 @@ public class BotBootstrapper
         locator.IndexTemplates(assetsPath);
 
         var clicker = new NavigationClicker(vision, locator, input);
+        var combat = new CombatClicker(vision, locator, input);
 
         // Birth the navigation service
-        Navigation = new Navigation(clicker, vision, locator, input);
+        Navigation = new Navigation(clicker, combat, vision, locator, input);
     }
 }
