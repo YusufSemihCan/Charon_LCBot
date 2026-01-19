@@ -17,14 +17,24 @@ namespace Charon.Vision
         void IndexTemplates(string subFolderPath);
         void UnloadFromRam(string templateName);
         //  FIND (Fast Gray)
-        Rectangle Find(Image<Gray, byte> screen, string templateName, double threshold = 0.9);
-        //  FIND (Precise Color)
-        Rectangle Find(Image<Bgr, byte> screen, string templateName, double threshold = 0.9);
+        /// <summary>
+        /// Finds the specified template within the screen image using Grayscale matching.
+        /// </summary>
+        Rectangle Find(Image<Gray, byte> screen, string templateName, double threshold = 0.9, bool useEdges = false);
 
-        // READ (Standard Gray)
+        /// <summary>
+        /// Finds the specified template within the screen image using Color matching.
+        /// </summary>
+        Rectangle Find(Image<Bgr, byte> screen, string templateName, double threshold = 0.9, bool useEdges = false);
+
+        /// <summary>
+        /// Performs OCR on a specific region of a Grayscale image.
+        /// </summary>
         string Read(Image<Gray, byte> screen, Rectangle area);
 
-        // READ (Color Convenience)
+        /// <summary>
+        /// Performs OCR on a specific region of a Color image (automatically converts to Gray).
+        /// </summary>
         string Read(Image<Bgr, byte> screen, Rectangle area);
     }
 }

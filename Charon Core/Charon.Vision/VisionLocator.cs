@@ -1,8 +1,9 @@
-﻿using System.Drawing;
-using Emgu.CV;
+﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
+using System.Drawing;
 using Tesseract;
+using System.Linq;
 
 namespace Charon.Vision
 {
@@ -48,13 +49,20 @@ namespace Charon.Vision
         //  1. SETUP & INDEXING
         // =========================================================
 
+        /// <summary>
+        /// Scans the specified folder for template images (png, jpg, jpeg, bmp) and indexes them.
+        /// </summary>
+        /// <param name="subFolderPath">Relative path to the folder containing template images.</param>
         public void IndexTemplates(string subFolderPath)
         {
             string fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, subFolderPath);
             if (!Directory.Exists(fullPath)) return;
 
-            // Scan the folder for PNGs
-            foreach (var file in Directory.GetFiles(fullPath, "*.png"))
+            // Scan the folder for supported image formats
+            var extensions = new[] { "*.png", "*.jpg", "*.jpeg", "*.bmp" };
+            var files = extensions.SelectMany(ext => Directory.GetFiles(fullPath, ext)).Distinct();
+
+            foreach (var file in files)
             {
                 string name = Path.GetFileNameWithoutExtension(file);
 
@@ -78,15 +86,27 @@ namespace Charon.Vision
         // =========================================================
 
         // [GRAYSCALE SEARCH] - Fast, Robust, Low RAM
-        public Rectangle Find(Image<Gray, byte> screen, string templateName, double threshold = 0.9)
+        // [GRAYSCALE SEARCH] - Fast, Robust, Low RAM
+        /// <summary>
+        /// Finds the specified template within the screen image using Grayscale matching.
+        /// </summary>
+        /// <param name="screen">The screen image to search within.</param>
+        /// <param name="templateName">The name of the template to find (filename without extension).</param>
+        /// <param name="threshold">Minimum similarity score (0.0 to 1.0) to consider a match.</param>
+        /// <param name="useEdges">If true, uses Canny edge detection for matching (slower but handles lighting/color variations better).</param>
+        /// <returns>The bounding rectangle of the found template, or Rectangle.Empty if not found.</returns>
+        public Rectangle Find(Image<Gray, byte> screen, string templateName, double threshold = 0.9, bool useEdges = false)
         {
             if (!_filePaths.ContainsKey(templateName)) return Rectangle.Empty;
+
+            // A. CHECK RAM (Fastest)
+
 
             // A. CHECK RAM (Fastest)
             if (_grayCache.ContainsKey(templateName))
             {
                 UpdateLru(templateName); // Mark as "Recently Used"
-                return PerformMatch(screen, _grayCache[templateName], threshold);
+                return PerformMatch(screen, _grayCache[templateName], threshold, useEdges);
             }
 
             // B. LOAD FROM DISK (Slower)
@@ -97,18 +117,27 @@ namespace Charon.Vision
             if (_mode == CacheMode.Memory)
             {
                 // Memory Mode: Use once, then destroy immediately.
-                using (loadedImg) return PerformMatch(screen, loadedImg, threshold);
+                using (loadedImg) return PerformMatch(screen, loadedImg, threshold, useEdges);
             }
             else
             {
                 // Balanced/Speed Mode: Save to RAM (handling eviction if full)
                 AddToCache(templateName, loadedImg);
-                return PerformMatch(screen, loadedImg, threshold);
+                return PerformMatch(screen, loadedImg, threshold, useEdges);
             }
         }
 
         // [COLOR SEARCH] - Precise (Red vs Blue), Higher RAM
-        public Rectangle Find(Image<Bgr, byte> screen, string templateName, double threshold = 0.9)
+        // [COLOR SEARCH] - Precise (Red vs Blue), Higher RAM
+        /// <summary>
+        /// Finds the specified template within the screen image using Color matching.
+        /// </summary>
+        /// <param name="screen">The screen image to search within.</param>
+        /// <param name="templateName">The name of the template to find.</param>
+        /// <param name="threshold">Minimum similarity score.</param>
+        /// <param name="useEdges">if true, uses edge detection (converts to gray internally).</param>
+        /// <returns>Rectangle of match.</returns>
+        public Rectangle Find(Image<Bgr, byte> screen, string templateName, double threshold = 0.9, bool useEdges = false)
         {
             if (!_filePaths.ContainsKey(templateName)) return Rectangle.Empty;
 
@@ -116,7 +145,7 @@ namespace Charon.Vision
             if (_colorCache.ContainsKey(templateName))
             {
                 UpdateLru(templateName);
-                return PerformMatch(screen, _colorCache[templateName], threshold);
+                return PerformMatch(screen, _colorCache[templateName], threshold, useEdges);
             }
 
             // B. LOAD FROM DISK
@@ -126,12 +155,12 @@ namespace Charon.Vision
             // C. CACHE LOGIC
             if (_mode == CacheMode.Memory)
             {
-                using (loadedImg) return PerformMatch(screen, loadedImg, threshold);
+                using (loadedImg) return PerformMatch(screen, loadedImg, threshold, useEdges);
             }
             else
             {
                 AddToCache(templateName, loadedImg);
-                return PerformMatch(screen, loadedImg, threshold);
+                return PerformMatch(screen, loadedImg, threshold, useEdges);
             }
         }
 
@@ -140,22 +169,27 @@ namespace Charon.Vision
         // =========================================================
 
         // [STRICT READ] - Expects Gray (Performance safe)
+        // [STRICT READ] - Expects Gray (Performance safe)
+        /// <summary>
+        /// Performs OCR on a specific region of a Grayscale image.
+        /// </summary>
+        /// <param name="screen">The image to read from.</param>
+        /// <param name="area">The region to crop and read.</param>
+        /// <returns>The recognized text.</returns>
         public string Read(Image<Gray, byte> screen, Rectangle area)
         {
             if (_ocrEngine == null) return "";
 
-            // "ROI" (Region of Interest) lets us look at a specific box without cropping/copying memory.
             screen.ROI = area;
             try
             {
-                // Tesseract requires a .NET Bitmap stream.
-                using (var bmp = screen.ToBitmap())
-                using (var stream = new MemoryStream())
+                using (var cropped = screen.Copy())
+                using (var binary = cropped.ThresholdBinary(new Gray(150), new Gray(255)))
+                using (var bmp = binary.ToBitmap())
                 {
-                    bmp.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
-
-                    using (var pix = Pix.LoadFromMemory(stream.ToArray()))
-                    using (var page = _ocrEngine.Process(pix))
+                    // Try passing the Bitmap directly; most modern Tesseract wrappers 
+                    // handle the conversion internally now.
+                    using (var page = _ocrEngine.Process(bmp))
                     {
                         return page.GetText().Trim();
                     }
@@ -163,11 +197,15 @@ namespace Charon.Vision
             }
             finally
             {
-                screen.ROI = Rectangle.Empty; // CRITICAL: Always reset ROI or future scans will fail.
+                screen.ROI = Rectangle.Empty; // CRITICAL: Always reset ROI
             }
         }
 
         // [CONVENIENCE READ] - Accepts Color, converts to Gray automatically.
+        // [CONVENIENCE READ] - Accepts Color, converts to Gray automatically.
+        /// <summary>
+        /// Performs OCR on a specific region of a Color image (automatically converts to Gray).
+        /// </summary>
         public string Read(Image<Bgr, byte> screen, Rectangle area)
         {
             // Tesseract works poorly with Color.
@@ -227,19 +265,30 @@ namespace Charon.Vision
         }
 
         // The "Math" behind finding an image
-        private Rectangle PerformMatch<TColor, TDepth>(Image<TColor, TDepth> screen, Image<TColor, TDepth> template, double threshold)
+        private Rectangle PerformMatch<TColor, TDepth>(Image<TColor, TDepth> screen, Image<TColor, TDepth> template, double threshold, bool useEdges = false)
             where TColor : struct, IColor
             where TDepth : new()
         {
-            // Sanity Check: Needle can't be bigger than the haystack
             if (template.Width > screen.Width || template.Height > screen.Height) return Rectangle.Empty;
+            
+            // FIX: Edge detection helps find "smooth" objects by matching outlines
+            if (useEdges)
+            {
+                using (var screenGray = screen.Convert<Gray, byte>())
+                using (var templateGray = template.Convert<Gray, byte>())
+                using (var screenEdges = screenGray.Canny(100, 200))
+                using (var templateEdges = templateGray.Canny(100, 200))
+                using (var result = screenEdges.MatchTemplate(templateEdges, TemplateMatchingType.CcoeffNormed))
+                {
+                    result.MinMax(out _, out double[] maxVs, out _, out Point[] maxLocs);
+                    if (maxVs[0] >= threshold) return new Rectangle(maxLocs[0], template.Size);
+                }
+            }
 
-            // 'CcoeffNormed' is robust against brightness changes (Flash/Day-Night)
+            // Default matching logic
             using (Image<Gray, float> result = screen.MatchTemplate(template, TemplateMatchingType.CcoeffNormed))
             {
                 result.MinMax(out _, out double[] maxValues, out _, out Point[] maxLocations);
-
-                // If the match score (0.0 to 1.0) is good enough, return the location
                 if (maxValues[0] >= threshold) return new Rectangle(maxLocations[0], template.Size);
             }
             return Rectangle.Empty;

@@ -1,136 +1,135 @@
-﻿using System.Drawing;
+﻿using Emgu.CV;
+using Emgu.CV.Structure;
+using System.Collections.Concurrent;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-using Emgu.CV;
-using Emgu.CV.Structure;
 
 namespace Charon.Vision
 {
-    /// <summary>
+
     /// Handles Image Capture from Screen.
     /// Has option to use Cached Buffers for improved performance.
     /// Has option to capture Color or Grayscale images.
-    /// </summary>
     public class VisionService : IVisionService, IDisposable
     {
-        private readonly Dictionary<Size, Bitmap> _bufferCache = new Dictionary<Size, Bitmap>();
-
-        // Private variable for the "Safety Lock" (prevents double-disposal)
+        private readonly ConcurrentDictionary<Size, Bitmap> _bufferCache = new ConcurrentDictionary<Size, Bitmap>();
+        private readonly object _paintLock = new object(); // Essential for preventing GDI+ "Object in use" crashes
         private bool _disposed = false;
 
-        // Save the dimensions of the screen.
-        // Create a public varibale to share with other classes.
-        private readonly Rectangle _screenresolution;
-        public Rectangle ScreenResolution => _screenresolution;
-
-        // Ask the OS for Screen Resolution
-        [DllImport("user32.dll")] private static extern int GetSystemMetrics(int nIndex);
-
-        public VisionService()
-        {
-            // Assign ScreenResolution acquired from the OS
-            int width = GetSystemMetrics(0);
-            int height = GetSystemMetrics(1);
-
-            // Store it for later use
-            _screenresolution = new Rectangle(0, 0, width, height);
-        }
-
-        // Helper to avoid duplicating the "Painting" logic
-        private void PaintToBuffer(Bitmap buffer, Rectangle rect)
-        {
-            using (Graphics graph = Graphics.FromImage(buffer))
-            {
-                nint hdcDest = graph.GetHdc();
-                nint hdcSrc = GetWindowDC(GetDesktopWindow());
-
-                BitBlt(hdcDest, 0, 0, rect.Width, rect.Height, hdcSrc, rect.X, rect.Y, SRCCOPY);
-
-                ReleaseDC(GetDesktopWindow(), hdcSrc);
-                graph.ReleaseHdc(hdcDest);
-            }
-        }
-
-        // Capture Bitmaps in a memory-efficient way
-        private Bitmap CaptureRawBitmap(Rectangle rect, bool useCache)
-        {
-            // OPTION A: ONE-TIME BUFFER
-            if (!useCache)
-            {
-                Bitmap tempBmp = new Bitmap(rect.Width, rect.Height, PixelFormat.Format24bppRgb);
-                PaintToBuffer(tempBmp, rect);
-                return tempBmp; // Return a brand new object
-            }
-
-            // OPTION B: CACHED BUFFER
-            // Check if we have a buffer of this size already if not create one
-            if (!_bufferCache.ContainsKey(rect.Size))
-            {
-                // Create it once
-                Bitmap newBuffer = new Bitmap(rect.Width, rect.Height, PixelFormat.Format24bppRgb);
-                // Put it on the shelf
-                _bufferCache.Add(rect.Size, newBuffer);
-            }
-
-            // Call the cached buffer
-            Bitmap buffer = _bufferCache[rect.Size];
-
-            // Use the buffer to capture the screen region
-            PaintToBuffer(buffer, rect);
-
-            return buffer;
-        }
-
-        // Ask the OS for Device Context [Scanner]
-        // Prepare a blank canvas and copy the image data into it
-        // Cleanup the handles we used
+        [DllImport("user32.dll")] private static extern bool SetProcessDPIAware();
         [DllImport("gdi32.dll")] private static extern bool BitBlt(nint hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, nint hdcSrc, int nXSrc, int nYSrc, int dwRop);
         [DllImport("user32.dll")] private static extern nint GetDesktopWindow();
         [DllImport("user32.dll")] private static extern nint GetWindowDC(nint hWnd);
         [DllImport("user32.dll")] private static extern nint ReleaseDC(nint hWnd, nint hDC);
         private const int SRCCOPY = 0x00CC0020;
 
-        // OPTION 1: Get a Standard Color Image
+        private readonly Rectangle _screenResolution;
+        public Rectangle ScreenResolution => _screenResolution;
+
+        [DllImport("user32.dll")] private static extern int GetSystemMetrics(int nIndex);
+
+        public VisionService()
+        {
+            SetProcessDPIAware(); // Ensure physical pixel accuracy
+            int width = GetSystemMetrics(0);
+            int height = GetSystemMetrics(1);
+            _screenResolution = new Rectangle(0, 0, width, height);
+        }
+
+        /// Captures screen data into the provided buffer using Win32 BitBlt.
+        private void PaintToBuffer(Bitmap buffer, Rectangle rect)
+        {
+            // Remove the lock from here since it's now handled by the caller
+            using (Graphics graph = Graphics.FromImage(buffer))
+            {
+                nint hdcDest = graph.GetHdc();
+                nint hdcSrc = GetWindowDC(GetDesktopWindow());
+                try
+                {
+                    BitBlt(hdcDest, 0, 0, rect.Width, rect.Height, hdcSrc, rect.X, rect.Y, SRCCOPY);
+                }
+                finally
+                {
+                    ReleaseDC(GetDesktopWindow(), hdcSrc);
+                    graph.ReleaseHdc(hdcDest);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Captures a specific region of the screen.
+        /// </summary>
+        /// <param name="rect">The area to capture.</param>
+        /// <param name="useCache">If true, re-uses an existing buffer (faster but requires thread safety).</param>
+        /// <returns>A Color image of the region.</returns>
         public Image<Bgr, byte> CaptureRegion(Rectangle rect, bool useCache = false)
         {
-            // We call our private helper to get the raw bitmap
-            // CRITICAL FIX: Removed 'using' here. We handle disposal manually below.
-            Bitmap bmp = CaptureRawBitmap(rect, useCache);
-
-            try
+            // If using cache, we must lock the entire process because Emgu's ToImage 
+            // reads Bitmap properties that GDI+ considers 'in use' during a BitBlt.
+            if (useCache)
             {
-                // Convert to Emgu Color format
-                return bmp.ToImage<Bgr, byte>();
-            }
-            finally
-            {
-                // If we created a temporary one-time bitmap, we MUST destroy it now.
-                // If it is from the cache, we MUST NOT destroy it.
-                if (!useCache)
+                lock (_paintLock)
                 {
-                    bmp.Dispose();
+                    Bitmap bmp = CaptureRawBitmap(rect, useCache);
+                    return bmp.ToImage<Bgr, byte>();
                 }
             }
+
+            // Non-cached version uses a unique object, so it's thread-safe by default.
+            Bitmap tempBmp = CaptureRawBitmap(rect, useCache);
+            try { return tempBmp.ToImage<Bgr, byte>(); }
+            finally { tempBmp.Dispose(); }
         }
 
-        // OPTION 2: Get a Grayscale Image
+        /// <summary>
+        /// Captures the entire primary screen.
+        /// </summary>
+        /// <param name="useCache">If true, re-uses buffers.</param>
+        /// <returns>A Color image of the screen.</returns>
+        public Image<Bgr, byte> CaptureScreen(bool useCache = false)
+        {
+            return CaptureRegion(_screenResolution, useCache);
+        }
+
+        /// <summary>
+        /// Captures a specific region of the screen as Grayscale.
+        /// </summary>
+        /// <param name="rect">The area to capture.</param>
+        /// <param name="useCache">If true, re-uses buffers.</param>
+        /// <returns>A Grayscale image of the region.</returns>
         public Image<Gray, byte> CaptureRegionGray(Rectangle rect, bool useCache = false)
         {
-            Bitmap bmp = CaptureRawBitmap(rect, useCache);
-            try
+            if (useCache)
             {
-                // Convert to Emgu Grayscale format directly
-                return bmp.ToImage<Gray, byte>();
-            }
-            finally
-            {
-                if (!useCache)
+                lock (_paintLock)
                 {
-                    bmp.Dispose();
+                    Bitmap bmp = CaptureRawBitmap(rect, useCache);
+                    return bmp.ToImage<Gray, byte>();
                 }
             }
+
+            Bitmap tempBmp = CaptureRawBitmap(rect, useCache);
+            try { return tempBmp.ToImage<Gray, byte>(); }
+            finally { tempBmp.Dispose(); }
         }
-        // CLEANUP (IDisposable Implementation)
+
+        private Bitmap CaptureRawBitmap(Rectangle rect, bool useCache)
+        {
+            if (!useCache)
+            {
+                Bitmap tempBmp = new Bitmap(rect.Width, rect.Height, PixelFormat.Format24bppRgb);
+                PaintToBuffer(tempBmp, rect);
+                return tempBmp;
+            }
+
+            Bitmap buffer = _bufferCache.GetOrAdd(rect.Size, s =>
+                new Bitmap(s.Width, s.Height, PixelFormat.Format24bppRgb));
+
+            PaintToBuffer(buffer, rect);
+            return buffer;
+        }
+
         public void Dispose()
         {
             Dispose(true);
@@ -140,13 +139,9 @@ namespace Charon.Vision
         protected virtual void Dispose(bool disposing)
         {
             if (_disposed) return;
-
             if (disposing)
             {
-                foreach (var bmp in _bufferCache.Values)
-                {
-                    bmp.Dispose();
-                }
+                foreach (var bmp in _bufferCache.Values) bmp.Dispose();
                 _bufferCache.Clear();
             }
             _disposed = true;

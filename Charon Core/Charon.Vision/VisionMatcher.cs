@@ -1,6 +1,7 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
+using System.Linq;
 
 namespace Charon.Vision
 {
@@ -14,12 +15,21 @@ namespace Charon.Vision
         private readonly Dictionary<string, Image<Bgr, byte>> _libraryColor = new Dictionary<string, Image<Bgr, byte>>();
         private readonly Dictionary<string, Image<Gray, byte>> _libraryGray = new Dictionary<string, Image<Gray, byte>>();
 
+        /// <summary>
+        /// Loads template images from the specified folder into memory (both Color and Gray versions).
+        /// Supports png, jpg, jpeg, bmp.
+        /// </summary>
+        /// <param name="subFolderPath">Relative path to the folder.</param>
         public void LoadLibrary(string subFolderPath)
         {
             string fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, subFolderPath);
             if (!Directory.Exists(fullPath)) return;
 
-            foreach (var file in Directory.GetFiles(fullPath, "*.png"))
+            var extensions = new[] { ".png", ".jpg", ".jpeg", ".bmp" };
+            var files = Directory.GetFiles(fullPath, "*.*")
+                .Where(f => extensions.Contains(Path.GetExtension(f).ToLower()));
+
+            foreach (var file in files)
             {
                 string name = Path.GetFileNameWithoutExtension(file);
 
@@ -46,6 +56,12 @@ namespace Charon.Vision
         }
 
         // CLASSIFY (COLOR)
+        /// <summary>
+        /// Finds the best match for the given image from the loaded library (Color).
+        /// </summary>
+        /// <param name="itemImage">The image to classify.</param>
+        /// <param name="threshold">Minimum similarity score.</param>
+        /// <returns>Result containing the best match name and score.</returns>
         public MatchResult Classify(Image<Bgr, byte> itemImage, double threshold = 0.85)
         {
             string bestMatchName = "Unknown";
@@ -65,6 +81,12 @@ namespace Charon.Vision
         }
 
         // CLASSIFY (GRAY)
+        /// <summary>
+        /// Finds the best match for the given image from the loaded library (Grayscale).
+        /// </summary>
+        /// <param name="itemImage">The image to classify.</param>
+        /// <param name="threshold">Minimum similarity score.</param>
+        /// <returns>Result containing the best match name and score.</returns>
         public MatchResult Classify(Image<Gray, byte> itemImage, double threshold = 0.85)
         {
             string bestMatchName = "Unknown";

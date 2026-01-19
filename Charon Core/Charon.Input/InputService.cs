@@ -10,7 +10,12 @@ namespace Charon.Input
     {
         private readonly Random _rng = new Random();
 
+        #region Safety Check
         // 1. SAFETY CHECK
+        /// <summary>
+        /// Checks if the mouse is in the fail-safe position (0,0) and throws an exception if true.
+        /// </summary>
+        /// <returns>False if safe, throws exception if not.</returns>
         public bool CheckFailSafe()
         {
             GetCursorPos(out POINT pos);
@@ -21,8 +26,15 @@ namespace Charon.Input
             }
             return false;
         }
+        #endregion
 
+        #region Mouse Movement
         // 2. MOUSE MOVEMENT
+        /// <summary>
+        /// Moves the mouse to the specified coordinates.
+        /// </summary>
+        /// <param name="dest">Target coordinates.</param>
+        /// <param name="humanLike">If true, uses a human-like Bezier curve path.</param>
         public void MoveMouse(Point dest, bool humanLike = false)
         {
             CheckFailSafe(); // Safety check before moving
@@ -51,8 +63,14 @@ namespace Charon.Input
                 Thread.Sleep(_rng.Next(5, 15));
             }
         }
+        #endregion
 
+        #region Clicks and Scroll
         // 3. CLICKS & SCROLL
+        /// <summary>
+        /// Performs a left mouse click.
+        /// </summary>
+        /// <param name="holdTime">How long to hold the button down in ms.</param>
         public void LeftClick(int holdTime = 20)
         {
             CheckFailSafe();
@@ -66,6 +84,10 @@ namespace Charon.Input
             SendMouseAction(MOUSEEVENTF_LEFTUP);
         }
 
+        /// <summary>
+        /// Performs a right mouse click.
+        /// </summary>
+        /// <param name="holdTime">How long to hold the button down in ms.</param>
         public void RightClick(int holdTime = 20)
         {
             CheckFailSafe();
@@ -78,6 +100,10 @@ namespace Charon.Input
             SendMouseAction(MOUSEEVENTF_RIGHTUP);
         }
 
+        /// <summary>
+        /// Scrolls the mouse wheel.
+        /// </summary>
+        /// <param name="amount">Amount to scroll (positive is up, negative is down).</param>
         public void Scroll(int amount)
         {
             var input = new INPUT { type = INPUT_MOUSE };
@@ -85,8 +111,16 @@ namespace Charon.Input
             input.mi.mouseData = (uint)amount;
             SendInput(1, new[] { input }, Marshal.SizeOf(typeof(INPUT)));
         }
+        #endregion
 
+        #region Dragging
         // 4. DRAGGING
+        /// <summary>
+        /// Drags the mouse from start to end.
+        /// </summary>
+        /// <param name="start">Start coordinates.</param>
+        /// <param name="end">End coordinates.</param>
+        /// <param name="humanLike">If true, uses human-like movement.</param>
         public void Drag(Point start, Point end, bool humanLike = false)
         {
             MoveMouse(start, humanLike);
@@ -99,8 +133,15 @@ namespace Charon.Input
             Thread.Sleep(30); // Brief pause before releasing
             SendMouseAction(MOUSEEVENTF_LEFTUP);
         }
+        #endregion
 
+        #region Keyboard
         // 5. KEYBOARD
+        /// <summary>
+        /// Presses a keyboard key.
+        /// </summary>
+        /// <param name="key">The virtual key to press.</param>
+        /// <param name="holdTime">How long to hold the key down in ms.</param>
         public void PressKey(VirtualKey key, int holdTime = 20)
         {
             CheckFailSafe();
@@ -112,6 +153,7 @@ namespace Charon.Input
             Thread.Sleep(actualHold);
             SendKeyInput((ushort)key, KEYEVENTF_KEYUP);   // Up
         }
+        #endregion
 
         // Private Calculations
         private void SendMouseInput(int x, int y, uint flags)

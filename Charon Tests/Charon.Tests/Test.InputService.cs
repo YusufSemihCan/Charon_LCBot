@@ -62,7 +62,7 @@ namespace Charon.Tests
 
         [Test]
         [Description("Verifies that RightClick respects the explicit holdTime parameter.")]
-        public void RightClick_RespectsHoldTime()
+       public void RightClick_RespectsHoldTime()
         {
             int requestedHold = 50;
             var watch = Stopwatch.StartNew();
@@ -139,6 +139,17 @@ namespace Charon.Tests
         }
 
         [Test]
+        public void MoveMouse_ExtremeCoordinates_DoesNotThrow()
+        {
+            // Tests that the math inside SendMouseInput doesn't divide by zero or overflow
+            Assert.Multiple(() =>
+            {
+                Assert.DoesNotThrow(() => _service.MoveMouse(new Point(100, 100), false));
+                Assert.DoesNotThrow(() => _service.MoveMouse(new Point(9999, 9999), false));
+            });
+        }
+
+        [Test]
         [Description("Verifies Drag sequence takes at least 60ms (30ms down + 30ms up).")]
         public void Drag_Timing_IsCorrect()
         {
@@ -154,25 +165,14 @@ namespace Charon.Tests
         }
 
         [Test]
-        public void MoveMouse_ExtremeCoordinates_DoesNotThrow()
-        {
-            // Tests that the math inside SendMouseInput doesn't divide by zero or overflow
-            Assert.Multiple(() =>
-            {
-                Assert.DoesNotThrow(() => _service.MoveMouse(new Point(100, 100), false));
-                Assert.DoesNotThrow(() => _service.MoveMouse(new Point(9999, 9999), false));
-            });
-        }
-
-        // --- DRAG TESTS ---
-
-        [Test]
         public void Drag_Execution_DoesNotThrow()
         {
             Point p1 = new Point(100, 100);
             Point p2 = new Point(300, 300);
             Assert.DoesNotThrow(() => _service.Drag(p1, p2, humanLike: false));
         }
+
+        // --- SCROLL TESTS ---
 
         [Test]
         [Description("Verifies that Scroll handles large increments and decrements without throwing.")]
@@ -201,16 +201,6 @@ namespace Charon.Tests
             });
         }
 
-        // --- SAFETY & UTILITY ---
-
-        [Test]
-        public void CheckFailSafe_DoesNotThrow_InSafeZone()
-        {
-            // Move mouse away from 0,0 first
-            _service.MoveMouse(new Point(200, 200), humanLike: false);
-            Assert.DoesNotThrow(() => _service.CheckFailSafe());
-        }
-
         [Test]
         public void Scroll_Execution_DoesNotThrow()
         {
@@ -219,6 +209,16 @@ namespace Charon.Tests
                 Assert.DoesNotThrow(() => _service.Scroll(120));  // Up
                 Assert.DoesNotThrow(() => _service.Scroll(-120)); // Down
             });
+        }
+
+        // --- SAFETY & UTILITY ---
+
+        [Test]
+        public void CheckFailSafe_DoesNotThrow_InSafeZone()
+        {
+            // Move mouse away from 0,0 first
+            _service.MoveMouse(new Point(200, 200), humanLike: false);
+            Assert.DoesNotThrow(() => _service.CheckFailSafe());
         }
     }
 }
