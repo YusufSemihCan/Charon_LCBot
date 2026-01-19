@@ -101,7 +101,7 @@ namespace Charon.Input
         }
 
         // 5. KEYBOARD
-        public void PressKey(VirtualKey key, int holdTime = 50)
+        public void PressKey(VirtualKey key, int holdTime = 20)
         {
             CheckFailSafe();
 

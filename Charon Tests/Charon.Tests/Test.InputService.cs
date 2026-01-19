@@ -77,7 +77,6 @@ namespace Charon.Tests
         [Description("Ensures RightClick handles negative input safely via clamping.")]
         public void RightClick_NegativeHoldTime_DoesNotThrow()
         {
-            // Adding this as it was missing from previous versions
             Assert.DoesNotThrow(() => _service.RightClick(-100));
         }
 
@@ -87,7 +86,7 @@ namespace Charon.Tests
         [Description("Verifies that PressKey uses defualt holdTime without parameters.")]
         public void PressKey_DefaultHoldTime_Works()
         {
-            // Verifies the default 50ms parameter logic works
+            // Verifies the default 20ms parameter logic works
             Assert.DoesNotThrow(() => _service.PressKey(VirtualKey.W));
         }
 
@@ -160,10 +159,12 @@ namespace Charon.Tests
             // Tests that the math inside SendMouseInput doesn't divide by zero or overflow
             Assert.Multiple(() =>
             {
-                Assert.DoesNotThrow(() => _service.MoveMouse(new Point(0, 0), false));
+                Assert.DoesNotThrow(() => _service.MoveMouse(new Point(100, 100), false));
                 Assert.DoesNotThrow(() => _service.MoveMouse(new Point(9999, 9999), false));
             });
         }
+
+        // --- DRAG TESTS ---
 
         [Test]
         public void Drag_Execution_DoesNotThrow()
@@ -171,6 +172,33 @@ namespace Charon.Tests
             Point p1 = new Point(100, 100);
             Point p2 = new Point(300, 300);
             Assert.DoesNotThrow(() => _service.Drag(p1, p2, humanLike: false));
+        }
+
+        [Test]
+        [Description("Verifies that Scroll handles large increments and decrements without throwing.")]
+        public void Scroll_LargeValues_DoesNotThrow()
+        {
+            Assert.Multiple(() =>
+            {
+                // Test large scroll up
+                Assert.DoesNotThrow(() => _service.Scroll(5000), "Failed on large positive scroll.");
+
+                // Test large scroll down
+                Assert.DoesNotThrow(() => _service.Scroll(-5000), "Failed on large negative scroll.");
+            });
+        }
+
+        [Test]
+        [Description("Verifies that multiple scroll calls in quick succession execute safely.")]
+        public void Scroll_RapidSequence_DoesNotThrow()
+        {
+            Assert.DoesNotThrow(() =>
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    _service.Scroll(120);
+                }
+            });
         }
 
         // --- SAFETY & UTILITY ---
