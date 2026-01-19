@@ -56,21 +56,25 @@ namespace Charon.Input
         public void LeftClick(int holdTime = 20)
         {
             CheckFailSafe();
+
+            // Fix: Ensure holdTime is never less than 0
+            int actualHold = Math.Max(0, holdTime);
+
             SendMouseAction(MOUSEEVENTF_LEFTDOWN);
-
             // Explicitly hold for the duration requested
-            Thread.Sleep(holdTime);
-
+            Thread.Sleep(actualHold);
             SendMouseAction(MOUSEEVENTF_LEFTUP);
         }
 
         public void RightClick(int holdTime = 20)
         {
             CheckFailSafe();
+
+            // Fix: Ensure holdTime is never less than 0
+            int actualHold = Math.Max(0, holdTime);
+
             SendMouseAction(MOUSEEVENTF_RIGHTDOWN);
-
-            Thread.Sleep(holdTime);
-
+            Thread.Sleep(actualHold);
             SendMouseAction(MOUSEEVENTF_RIGHTUP);
         }
 
