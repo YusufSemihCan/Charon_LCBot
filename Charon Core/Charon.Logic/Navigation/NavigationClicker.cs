@@ -29,7 +29,7 @@ namespace Charon.Logic.Navigation
 
             Point center = new Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2);
             _input.MoveMouse(center, humanLike: true); // Move using human emulation
-            _input.LeftClick(humanLike: true);
+            _input.LeftClick();
 
             return true;
         }
@@ -37,7 +37,7 @@ namespace Charon.Logic.Navigation
         public void DismissWithEsc()
         {
             _input.CheckFailSafe();
-            _input.PressKey(VirtualKey.ESCAPE, humanLike: true); // Use Esc to clear random popups
+            _input.PressKey(VirtualKey.ESCAPE); // Use Esc to clear random popups
         }
     }
 }

@@ -10,7 +10,7 @@ public class BotBootstrapper
     {
         var vision = new VisionService();
         var locator = new VisionLocator(CacheMode.Balanced);
-        var input = new InputService(vision);
+        IInputService input = new InputService();
 
         // Link physical images
         string assetsPath = PathResolver.GetNavigationAssetsPath();
