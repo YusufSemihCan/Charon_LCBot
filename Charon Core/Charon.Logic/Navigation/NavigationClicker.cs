@@ -4,13 +4,13 @@ using System.Drawing;
 
 namespace Charon.Logic.Navigation
 {
-    public class MenuClicker
+    public class NavigationClicker
     {
         private readonly IVisionService _vision;
         private readonly IVisionLocator _locator;
         private readonly IInputService _input; // This is the field
 
-        public MenuClicker(IVisionService vision, IVisionLocator locator, IInputService input)
+        public NavigationClicker(IVisionService vision, IVisionLocator locator, IInputService input)
         {
             _vision = vision;
             _locator = locator;

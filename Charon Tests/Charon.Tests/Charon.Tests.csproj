@@ -16,9 +16,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Charon.Input\Charon.Input.csproj" />
-		<ProjectReference Include="..\Charon.Vision\Charon.Vision.csproj" />
-		<ProjectReference Include="..\Charon\Charon.csproj" />
+	  <ProjectReference Include="..\..\Charon Core\Charon.Input\Charon.Input.csproj" />
+	  <ProjectReference Include="..\..\Charon Core\Charon.Logic\Charon.Logic.csproj" />
+	  <ProjectReference Include="..\..\Charon Core\Charon.Vision\Charon.Vision.csproj" />
+	  <ProjectReference Include="..\..\Charon Core\Charon\Charon.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

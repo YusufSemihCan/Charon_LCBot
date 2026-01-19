@@ -3,21 +3,71 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36717.8
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Charon", "Charon\Charon.csproj", "{D60F82CB-20CF-44A4-B974-EDEBB42FC998}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Charon", "Charon Core\Charon\Charon.csproj", "{D60F82CB-20CF-44A4-B974-EDEBB42FC998}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Charon.Vision", "Charon.Vision\Charon.Vision.csproj", "{4AE1B202-4A41-4559-04AF-963C9B160490}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Charon.Vision", "Charon Core\Charon.Vision\Charon.Vision.csproj", "{4AE1B202-4A41-4559-04AF-963C9B160490}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Charon.Tests", "Charon.Tests\Charon.Tests.csproj", "{A3AB225E-953B-459C-9E0C-E5C2D953C516}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Charon.Tests", "Charon Tests\Charon.Tests\Charon.Tests.csproj", "{A3AB225E-953B-459C-9E0C-E5C2D953C516}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Charon.The.Driver", "Charon.The.Driver", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Charon.Input", "Charon Core\Charon.Input\Charon.Input.csproj", "{8D1862B4-2A16-414D-B767-6002F46801AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Charon.Input", "Charon.Input\Charon.Input.csproj", "{8D1862B4-2A16-414D-B767-6002F46801AB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Charon.Logic", "Charon Core\Charon.Logic\Charon.Logic.csproj", "{E5584B6B-7B39-43CC-B467-59E940B672B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Charon.Logic", "Charon.Logic\Charon.Logic.csproj", "{E5584B6B-7B39-43CC-B467-59E940B672B8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Charon Core", "Charon Core", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assets", "Assets", "{08C1CD50-2B4B-45C7-A3F7-3E3A77A03FF4}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Charon Tests", "Charon Tests", "{BEDAF71B-4537-49CA-A0ED-7A897F7E808A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Navigation", "Navigation", "{FAC4A8B4-7FE6-4E75-BCF3-3D98FE1D3B48}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assets", "Assets", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Navigation", "Navigation", "{EACC8CAC-50A7-49D9-BF53-A2A19E55F61F}"
+	ProjectSection(SolutionItems) = preProject
+		Assets\Navigation\Button_Active_Drive.png = Assets\Navigation\Button_Active_Drive.png
+		Assets\Navigation\Button_Active_Sinners.png = Assets\Navigation\Button_Active_Sinners.png
+		Assets\Navigation\Button_Active_Window.png = Assets\Navigation\Button_Active_Window.png
+		Assets\Navigation\Button_Back.png = Assets\Navigation\Button_Back.png
+		Assets\Navigation\Button_Cancel.png = Assets\Navigation\Button_Cancel.png
+		Assets\Navigation\Button_Charge_Cancel.png = Assets\Navigation\Button_Charge_Cancel.png
+		Assets\Navigation\Button_Charge_Confirm.png = Assets\Navigation\Button_Charge_Confirm.png
+		Assets\Navigation\Button_Halt.png = Assets\Navigation\Button_Halt.png
+		Assets\Navigation\Button_InActive_Drive.png = Assets\Navigation\Button_InActive_Drive.png
+		Assets\Navigation\Button_InActive_Sinners.png = Assets\Navigation\Button_InActive_Sinners.png
+		Assets\Navigation\Button_InActive_Window.png = Assets\Navigation\Button_InActive_Window.png
+		Assets\Navigation\Button_Luxcavation.png = Assets\Navigation\Button_Luxcavation.png
+		Assets\Navigation\Button_MD_Enter.png = Assets\Navigation\Button_MD_Enter.png
+		Assets\Navigation\Button_MD_InfinityMirror.png = Assets\Navigation\Button_MD_InfinityMirror.png
+		Assets\Navigation\Button_MD_S6.png = Assets\Navigation\Button_MD_S6.png
+		Assets\Navigation\Button_Resume.png = Assets\Navigation\Button_Resume.png
+		Assets\Navigation\Button_Text_Cancel.png = Assets\Navigation\Button_Text_Cancel.png
+		Assets\Navigation\Button_Text_Halt.png = Assets\Navigation\Button_Text_Halt.png
+		Assets\Navigation\Button_Text_Luxcavation.png = Assets\Navigation\Button_Text_Luxcavation.png
+		Assets\Navigation\Button_Text_MD.png = Assets\Navigation\Button_Text_MD.png
+		Assets\Navigation\Button_Text_MD_Enter.png = Assets\Navigation\Button_Text_MD_Enter.png
+		Assets\Navigation\Button_Text_MD_InfinityMirror.png = Assets\Navigation\Button_Text_MD_InfinityMirror.png
+		Assets\Navigation\Button_Text_Resume.png = Assets\Navigation\Button_Text_Resume.png
+		Assets\Navigation\Charge_Boxes.png = Assets\Navigation\Charge_Boxes.png
+		Assets\Navigation\Charge_Boxes_Window.png = Assets\Navigation\Charge_Boxes_Window.png
+		Assets\Navigation\Charge_Label.png = Assets\Navigation\Charge_Label.png
+		Assets\Navigation\Charge_Lunacy.png = Assets\Navigation\Charge_Lunacy.png
+		Assets\Navigation\Charge_Lunacy_Window.png = Assets\Navigation\Charge_Lunacy_Window.png
+		Assets\Navigation\Charge_Modules.png = Assets\Navigation\Charge_Modules.png
+		Assets\Navigation\Charge_Modules_Window.png = Assets\Navigation\Charge_Modules_Window.png
+		Assets\Navigation\Enkephalin.png = Assets\Navigation\Enkephalin.png
+		Assets\Navigation\EnkephalinBox.png = Assets\Navigation\EnkephalinBox.png
+		Assets\Navigation\Enkephalin_Numbers.png = Assets\Navigation\Enkephalin_Numbers.png
+		Assets\Navigation\MD_DungeonProgress.png = Assets\Navigation\MD_DungeonProgress.png
+		Assets\Navigation\MD_StarlightCount.png = Assets\Navigation\MD_StarlightCount.png
+		Assets\Navigation\MD_StarlightIcon.png = Assets\Navigation\MD_StarlightIcon.png
+		Assets\Navigation\NumberDial.png = Assets\Navigation\NumberDial.png
+		Assets\Navigation\NumberDialTransparent.png = Assets\Navigation\NumberDialTransparent.png
+		Assets\Navigation\NumberDialTransparent_Decrement.png = Assets\Navigation\NumberDialTransparent_Decrement.png
+		Assets\Navigation\NumberDialTransparent_Increment.png = Assets\Navigation\NumberDialTransparent_Increment.png
+		Assets\Navigation\NumberDialTransparent_Maximize.png = Assets\Navigation\NumberDialTransparent_Maximize.png
+		Assets\Navigation\NumberDialTransparent_Minimize.png = Assets\Navigation\NumberDialTransparent_Minimize.png
+		Assets\Navigation\NumberDial_Decrement.png = Assets\Navigation\NumberDial_Decrement.png
+		Assets\Navigation\NumberDial_Increment.png = Assets\Navigation\NumberDial_Increment.png
+		Assets\Navigation\NumberDial_Maximize.png = Assets\Navigation\NumberDial_Maximize.png
+		Assets\Navigation\NumberDial_Minimize.png = Assets\Navigation\NumberDial_Minimize.png
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -52,9 +102,10 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{D60F82CB-20CF-44A4-B974-EDEBB42FC998} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{4AE1B202-4A41-4559-04AF-963C9B160490} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{A3AB225E-953B-459C-9E0C-E5C2D953C516} = {BEDAF71B-4537-49CA-A0ED-7A897F7E808A}
 		{8D1862B4-2A16-414D-B767-6002F46801AB} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{E5584B6B-7B39-43CC-B467-59E940B672B8} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
-		{FAC4A8B4-7FE6-4E75-BCF3-3D98FE1D3B48} = {08C1CD50-2B4B-45C7-A3F7-3E3A77A03FF4}
+		{EACC8CAC-50A7-49D9-BF53-A2A19E55F61F} = {8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DEE3CE19-E78C-4D0A-9066-4DFEDDA7B983}

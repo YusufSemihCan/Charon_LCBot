@@ -1,6 +1,6 @@
 ﻿namespace Charon.Logic.Navigation
 {
-    public enum MenuNavigationState
+    public enum NavigationState
     {
         Unknown,
         Transition,    // Any screen transition

@@ -4,15 +4,15 @@ using System.Threading;
 
 namespace Charon.Logic.Navigation
 {
-    public class MenuNavigation
+    public class Navigation
     {
-        private readonly MenuClicker _clicker;
+        private readonly NavigationClicker _clicker;
         private readonly IVisionService _vision;
         private readonly IVisionLocator _locator;
         private readonly IInputService _input;
-        private MenuNavigationState _currentState = MenuNavigationState.Unknown;
+        private NavigationState _currentState = NavigationState.Unknown;
 
-        public MenuNavigation(MenuClicker clicker, IVisionService vision, IVisionLocator locator, IInputService input)
+        public Navigation(NavigationClicker clicker, IVisionService vision, IVisionLocator locator, IInputService input)
         {
             _clicker = clicker;
             _vision = vision;
@@ -20,7 +20,7 @@ namespace Charon.Logic.Navigation
             _input = input;
         }
 
-        public bool NavigateTo(MenuNavigationState target)
+        public bool NavigateTo(NavigationState target)
         {
             // Global safety check at the start of any navigation path
             _input.CheckFailSafe();
@@ -28,7 +28,7 @@ namespace Charon.Logic.Navigation
             if (_currentState == target) return true;
 
             // Connection and Popup handling
-            if (_currentState == MenuNavigationState.Connecting || target == MenuNavigationState.Window)
+            if (_currentState == NavigationState.Connecting || target == NavigationState.Window)
             {
                 if (!HandleConnectionAndPopups()) return false;
             }
@@ -36,11 +36,11 @@ namespace Charon.Logic.Navigation
             // Pathfinding logic
             return target switch
             {
-                MenuNavigationState.Window => true,
-                MenuNavigationState.Charge => NavigateToWindowThenClick("Btn_Charge", MenuNavigationState.Charge),
-                MenuNavigationState.Drive => NavigateToWindowThenClick("Btn_Drive", MenuNavigationState.Drive),
-                MenuNavigationState.Luxcavation_EXP => NavigateToDriveThenClick("Btn_Lux_EXP", MenuNavigationState.Luxcavation_EXP),
-                MenuNavigationState.MirrorDungeon => NavigateToDriveThenClick("Btn_Mirror_Dungeon", MenuNavigationState.MirrorDungeon),
+                NavigationState.Window => true,
+                NavigationState.Charge => NavigateToWindowThenClick("Btn_Charge", NavigationState.Charge),
+                NavigationState.Drive => NavigateToWindowThenClick("Btn_Drive", NavigationState.Drive),
+                NavigationState.Luxcavation_EXP => NavigateToDriveThenClick("Btn_Lux_EXP", NavigationState.Luxcavation_EXP),
+                NavigationState.MirrorDungeon => NavigateToDriveThenClick("Btn_Mirror_Dungeon", NavigationState.MirrorDungeon),
                 _ => false
             };
         }
@@ -55,7 +55,7 @@ namespace Charon.Logic.Navigation
                 using var screen = _vision.CaptureRegionGray(_vision.ScreenResolution);
                 if (!_locator.Find(screen, "Anchor_Window_HUD").IsEmpty)
                 {
-                    _currentState = MenuNavigationState.Window;
+                    _currentState = NavigationState.Window;
                     return true;
                 }
 
@@ -72,9 +72,9 @@ namespace Charon.Logic.Navigation
             return false;
         }
 
-        private bool NavigateToWindowThenClick(string template, MenuNavigationState nextState)
+        private bool NavigateToWindowThenClick(string template, NavigationState nextState)
         {
-            if (NavigateTo(MenuNavigationState.Window))
+            if (NavigateTo(NavigationState.Window))
             {
                 if (_clicker.ClickTemplate(template))
                 {
@@ -85,9 +85,10 @@ namespace Charon.Logic.Navigation
             return false;
         }
 
-        private bool NavigateToDriveThenClick(string template, MenuNavigationState nextState)
+        private bool NavigateToDriveThenClick(string template, NavigationState nextState)
         {
-            if (NavigateTo(MenuNavigationState.Drive))
+            // Now using the NavigationAssets constant instead of a raw string
+            if (NavigateTo(NavigationState.Drive))
             {
                 if (_clicker.ClickTemplate(template))
                 {

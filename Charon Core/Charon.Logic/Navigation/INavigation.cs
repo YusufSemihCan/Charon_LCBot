@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Charon.Logic.Navigation
 {
-    internal class IMenuNavigation
+    internal class INavigation
     {
     }
 }
