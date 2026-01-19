@@ -53,19 +53,24 @@ namespace Charon.Input
         }
 
         // 3. CLICKS & SCROLL
-        public void LeftClick()
+        public void LeftClick(int holdTime = 20)
         {
             CheckFailSafe();
             SendMouseAction(MOUSEEVENTF_LEFTDOWN);
-            Thread.Sleep(_rng.Next(50, 100));
+
+            // Explicitly hold for the duration requested
+            Thread.Sleep(holdTime);
+
             SendMouseAction(MOUSEEVENTF_LEFTUP);
         }
 
-        public void RightClick()
+        public void RightClick(int holdTime = 20)
         {
             CheckFailSafe();
             SendMouseAction(MOUSEEVENTF_RIGHTDOWN);
-            Thread.Sleep(_rng.Next(50, 100));
+
+            Thread.Sleep(holdTime);
+
             SendMouseAction(MOUSEEVENTF_RIGHTUP);
         }
 
@@ -81,11 +86,13 @@ namespace Charon.Input
         public void Drag(Point start, Point end, bool humanLike = false)
         {
             MoveMouse(start, humanLike);
+
             SendMouseAction(MOUSEEVENTF_LEFTDOWN);
-            Thread.Sleep(_rng.Next(100, 200));
+            Thread.Sleep(30); // Brief pause to ensure the grab registers
 
             MoveMouse(end, humanLike);
-            Thread.Sleep(_rng.Next(100, 200));
+
+            Thread.Sleep(30); // Brief pause before releasing
             SendMouseAction(MOUSEEVENTF_LEFTUP);
         }
 
