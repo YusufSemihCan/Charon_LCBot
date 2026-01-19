@@ -1,48 +1,62 @@
 ﻿using Charon.Input;
 using Charon.Vision;
 using System.Threading;
+using System;
 
 namespace Charon.Logic.Navigation
 {
-    public class Navigation
+    public class Navigation : INavigation
     {
-        private readonly NavigationClicker _clicker;
+        private readonly INavigationClicker _clicker;
         private readonly IVisionService _vision;
         private readonly IVisionLocator _locator;
         private readonly IInputService _input;
         private NavigationState _currentState = NavigationState.Unknown;
 
-        public Navigation(NavigationClicker clicker, IVisionService vision, IVisionLocator locator, IInputService input)
+        public NavigationState CurrentState => _currentState;
+
+        public Navigation(INavigationClicker clicker, IVisionService vision, IVisionLocator locator, IInputService input)
         {
-            _clicker = clicker;
-            _vision = vision;
-            _locator = locator;
-            _input = input;
+            _clicker = clicker ?? throw new ArgumentNullException(nameof(clicker));
+            _vision = vision ?? throw new ArgumentNullException(nameof(vision));
+            _locator = locator ?? throw new ArgumentNullException(nameof(locator));
+            _input = input ?? throw new ArgumentNullException(nameof(input));
         }
 
         public bool NavigateTo(NavigationState target)
         {
-            // Global safety check at the start of any navigation path
-            _input.CheckFailSafe();
+            _input.CheckFailSafe(); // Safety check at navigation start
 
             if (_currentState == target) return true;
 
-            // Connection and Popup handling
             if (_currentState == NavigationState.Connecting || target == NavigationState.Window)
             {
                 if (!HandleConnectionAndPopups()) return false;
             }
 
-            // Pathfinding logic
+            // Map-based pathfinding logic
             return target switch
             {
                 NavigationState.Window => true,
-                NavigationState.Charge => NavigateToWindowThenClick("Btn_Charge", NavigationState.Charge),
-                NavigationState.Drive => NavigateToWindowThenClick("Btn_Drive", NavigationState.Drive),
-                NavigationState.Luxcavation_EXP => NavigateToDriveThenClick("Btn_Lux_EXP", NavigationState.Luxcavation_EXP),
-                NavigationState.MirrorDungeon => NavigateToDriveThenClick("Btn_Mirror_Dungeon", NavigationState.MirrorDungeon),
+                NavigationState.Charge => NavigateToWindowThenClick(NavigationAssets.BtnCharge, NavigationState.Charge),
+                NavigationState.Drive => NavigateToWindowThenClick(NavigationAssets.BtnDrive, NavigationState.Drive),
+                NavigationState.Luxcavation_EXP => NavigateToDriveThenClick(NavigationAssets.BtnLuxExp, NavigationState.Luxcavation_EXP),
                 _ => false
             };
+        }
+
+        public NavigationState SynchronizeState()
+        {
+            using var screen = _vision.CaptureRegionGray(_vision.ScreenResolution);
+
+            if (!_locator.Find(screen, NavigationAssets.AnchorWindowHud).IsEmpty)
+                _currentState = NavigationState.Window;
+            else if (!_locator.Find(screen, NavigationAssets.BtnEnterGame).IsEmpty)
+                _currentState = NavigationState.Connecting;
+            else
+                _currentState = NavigationState.Unknown;
+
+            return _currentState;
         }
 
         private bool HandleConnectionAndPopups()
@@ -53,18 +67,19 @@ namespace Charon.Logic.Navigation
                 _input.CheckFailSafe();
 
                 using var screen = _vision.CaptureRegionGray(_vision.ScreenResolution);
-                if (!_locator.Find(screen, "Anchor_Window_HUD").IsEmpty)
+                if (!_locator.Find(screen, NavigationAssets.AnchorWindowHud).IsEmpty) // Verify location using anchor
                 {
                     _currentState = NavigationState.Window;
                     return true;
                 }
 
-                if (_clicker.ClickTemplate("Btn_Retry_Connection") || _clicker.ClickTemplate("Btn_Enter_Game"))
+                if (_clicker.ClickTemplate(NavigationAssets.BtnRetryConnection) || 
+                    _clicker.ClickTemplate(NavigationAssets.BtnEnterGame))
                 {
                     Thread.Sleep(3000);
                 }
 
-                _clicker.DismissWithEsc();
+                _clicker.DismissWithEsc(); // Clear random interference
 
                 retries--;
                 Thread.Sleep(1000);
@@ -87,7 +102,6 @@ namespace Charon.Logic.Navigation
 
         private bool NavigateToDriveThenClick(string template, NavigationState nextState)
         {
-            // Now using the NavigationAssets constant instead of a raw string
             if (NavigateTo(NavigationState.Drive))
             {
                 if (_clicker.ClickTemplate(template))
