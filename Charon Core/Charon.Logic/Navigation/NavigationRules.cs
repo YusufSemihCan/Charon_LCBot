@@ -53,7 +53,8 @@ namespace Charon.Logic.Navigation
                 {
                     NavigationState.Drive,             // Back
                     NavigationState.Luxcavation_Thread, // Toggle Tab
-                    NavigationState.Charge_Modules     // Enkephalin
+                    NavigationState.Charge_Modules,     // Enkephalin
+                    NavigationState.ToBattle           // Enter Level
                 }
             },
 
@@ -63,7 +64,8 @@ namespace Charon.Logic.Navigation
                 {
                     NavigationState.Drive,             // Back
                     NavigationState.Luxcavation_EXP,   // Toggle Tab
-                    NavigationState.Charge_Modules     // Enkephalin
+                    NavigationState.Charge_Modules,     // Enkephalin
+                    NavigationState.ToBattle           // Enter Level
                 }
             },
 
@@ -82,6 +84,27 @@ namespace Charon.Logic.Navigation
                 {
                     NavigationState.MirrorDungeon, // Back/Cancel?
                     NavigationState.Drive          // Force Back?
+                }
+            },
+            
+            // --- ToBattle ---
+            {
+                NavigationState.ToBattle, new List<NavigationState>
+                {
+                    NavigationState.Battle,             // Enter Battle
+                    NavigationState.Luxcavation_EXP,    // Back (Cancel)
+                    NavigationState.Luxcavation_Thread, // Back (Cancel)
+                    NavigationState.MirrorDungeon_Delving, // Potentially?
+                    NavigationState.Drive               // Deep Back?
+                }
+            },
+            
+            // --- Battle ---
+            {
+                NavigationState.Battle, new List<NavigationState>
+                {
+                     NavigationState.Success, // Win
+                     NavigationState.ToBattle // Give up/Retry?
                 }
             },
 

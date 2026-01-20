@@ -63,6 +63,11 @@ namespace Charon.Logic.Navigation
                  case NavigationState.MirrorDungeon:
                  case NavigationState.MirrorDungeon_Delving:
                     return NavigateFromMirrorDungeon(target);
+                    
+                 case NavigationState.ToBattle:
+                    return NavigateFromToBattle(target);
+                    
+                 // case NavigationState.Battle: // TODO
             }
 
             return false;
@@ -88,14 +93,21 @@ namespace Charon.Logic.Navigation
                 _currentState = NavigationState.Charge_Modules;
             else if (!_locator.Find(screenColor, NavigationAssets.ButtonActiveChargeLunacy).IsEmpty)
                 _currentState = NavigationState.Charge_Lunacy;
-            // If we see 'EnkephalinBox' maybe? No that's the button to open it.
-            // If we are in 'Charge' but no tab is active? (Unlikely)
             
-            // 2. Mirror Dungeon Popups (Overlay)
             // 2. Mirror Dungeon Popups (Overlay)
             else if (!_locator.Find(screenGray, NavigationAssets.MDDungeonProgress).IsEmpty)
             {
                 _currentState = NavigationState.MirrorDungeon_Delving;
+            }
+            // CRITICAL USER REQUEST: Prioritize Sinners Active Button over ToBattle Identifier.
+            // ToBattle identifier might be visible in Sinners screen.
+            else if (!_locator.Find(screenGray, NavigationAssets.ButtonActiveSinners).IsEmpty)
+                _currentState = NavigationState.Sinners;
+
+            // 3. ToBattle (Pre-Battle Screen)
+            else if (!_locator.Find(screenColor, NavigationAssets.IconToBattle).IsEmpty)
+            {
+                _currentState = NavigationState.ToBattle;
             }
             else if (!_locator.Find(screenGray, NavigationAssets.ButtonMDInfinityMirror).IsEmpty)
             {
@@ -122,8 +134,7 @@ namespace Charon.Logic.Navigation
             else if (!_locator.Find(screenGray, NavigationAssets.ButtonActiveDrive).IsEmpty 
                   || !_locator.Find(screenGray, NavigationAssets.ButtonTextDrive).IsEmpty) // Fallback to Text
                 _currentState = NavigationState.Drive;
-            else if (!_locator.Find(screenGray, NavigationAssets.ButtonActiveSinners).IsEmpty)
-                _currentState = NavigationState.Sinners;
+            // Sinners Moved Up
             else
                 _currentState = NavigationState.Unknown;
 
@@ -267,6 +278,12 @@ namespace Charon.Logic.Navigation
 
         private bool NavigateFromLuxcavation(NavigationState target)
         {
+            if (target == NavigationState.ToBattle)
+            {
+                // Enter Best Level
+                return EnterLuxcavationLevel();
+            }
+
             // Direct access to Charge via EnkephalinBox (available in Luxcavation too)
             if (target == NavigationState.Charge || target == NavigationState.Charge_Boxes || target == NavigationState.Charge_Modules || target == NavigationState.Charge_Lunacy)
             {
@@ -278,41 +295,20 @@ namespace Charon.Logic.Navigation
                       return NavigateTo(target);
                  }
             }
-
-            // ESC Strategy: "Return to previous state"
-            // Typically Luxcavation -> Drive
-            // [UPDATED] Prioritize Physical Back Button (Button_Back_Luxcavation), then ESC.
-            if (target == NavigationState.Drive || target == NavigationState.Window || target == NavigationState.Sinners)
+            // Leaving Luxcavation
+            if (target == NavigationState.Drive || target == NavigationState.Window)
             {
-                // 1. Try Back Button
-                if (_clicker.ClickTemplate(NavigationAssets.ButtonBackLuxcavation))
-                {
-                     Thread.Sleep(500);
-                     if (SynchronizeState() == target) return true;
-                }
-
-                // 2. Try ESC (Fallback)
+                // Prioritize ESC as requested
                 _clicker.DismissWithEsc();
-                Thread.Sleep(500);
-                var newState = SynchronizeState();
-                
-                // If we reached target, great.
-                if (newState == target) return true;
-                
-                // If we reached Drive (from Lux), and target is Window/Sinners, we can recurse.
-                if (newState == NavigationState.Drive) return NavigateTo(target);
-                
-                // If ESC failed to move us (stuck), try Standard ButtonBack as final fallback
-                if (newState == NavigationState.Luxcavation_EXP || newState == NavigationState.Luxcavation_Thread)
-                {
-                     return ClickTransition(NavigationAssets.ButtonBackLuxcavation, NavigationState.Drive) && NavigateTo(target);
-                }
+                Thread.Sleep(1000); // Wait for transition
+                if (SynchronizeState() == NavigationState.Drive) return NavigateTo(target);
+
+                // Fallback: Physical Back Button (if ESC failed to move detection)
+                if (ClickTransition(NavigationAssets.ButtonBackLuxcavation, NavigationState.Drive))
+                    return NavigateTo(target);
             }
 
-            if (target == NavigationState.Drive) // Fallback explicit
-                return ClickTransition(NavigationAssets.ButtonBackLuxcavation, NavigationState.Drive);
-            
-            // Toggle between EXP/Thread using INACTIVE buttons
+            // Standard Toggle between EXP/Thread using INACTIVE buttons
             if (target == NavigationState.Luxcavation_EXP)
                 return ClickTransition(NavigationAssets.ButtonInActiveLuxcavationEXP, NavigationState.Luxcavation_EXP);
             
@@ -355,6 +351,122 @@ namespace Charon.Logic.Navigation
                          if (_currentState == NavigationState.MirrorDungeon_Delving) return true;
                      }
                  }
+            }
+
+            return false;
+        }
+
+        // --- Missing Methods Re-Added ---
+
+        /// <summary>
+        /// Handles navigation from the 'ToBattle' (Pre-Battle) state.
+        /// </summary>
+        /// <param name="target">The target state (Battle or Back to Luxcavation).</param>
+        private bool NavigateFromToBattle(NavigationState target)
+        {
+            if (target == NavigationState.Battle)
+            {
+                // Press 'Enter' key to start battle
+                _input.PressKey(VirtualKey.ENTER);
+                Thread.Sleep(2000); // Wait for load
+                // We should eventually detect 'Battle' state
+                return true; 
+            }
+            
+            // Going Back from ToBattle -> Luxcavation
+            if (target == NavigationState.Luxcavation_EXP || target == NavigationState.Luxcavation_Thread)
+            {
+                // User prefers ESC
+                _clicker.DismissWithEsc();
+                Thread.Sleep(1000);
+                return SynchronizeState() == target;
+            }
+            
+            return false;
+        }
+
+        /// <summary>
+        /// Scans for the highest available Luxcavation EXP level (9 down to 1).
+        /// Identifies the correct 'Enter' button by matching its row (Y-coordinate) with the level text.
+        /// </summary>
+        /// <returns>True if a level was found and the enter button was clicked; otherwise false.</returns>
+        private bool EnterLuxcavationLevel()
+        {
+            // Scanning Levels: 9 down to 1
+            // Simple Scan First (What is visible?)
+            using var screen = _vision.CaptureRegion(_vision.ScreenResolution);
+            
+            // Levels to check (High to Low)
+            string[] levels = {
+                NavigationAssets.TextLuxcavationLevel9,
+                NavigationAssets.TextLuxcavationLevel8,
+                NavigationAssets.TextLuxcavationLevel7,
+                NavigationAssets.TextLuxcavationLevel6,
+                NavigationAssets.TextLuxcavationLevel5,
+                NavigationAssets.TextLuxcavationLevel4,
+                NavigationAssets.TextLuxcavationLevel3,
+                NavigationAssets.TextLuxcavationLevel2,
+                NavigationAssets.TextLuxcavationLevel1
+            };
+
+            System.Drawing.Rectangle bestLevelRect = System.Drawing.Rectangle.Empty;
+            string foundLevel = "";
+
+            foreach (var levelAsset in levels)
+            {
+                var rect = _locator.Find(screen, levelAsset, 0.85); // High confidence for text
+                if (!rect.IsEmpty)
+                {
+                    bestLevelRect = rect;
+                    foundLevel = levelAsset;
+                    break; // Found highest visible
+                }
+            }
+
+            if (bestLevelRect.IsEmpty)
+            {
+                // TODO: Scroll logic if nothing high is found.
+                return false;
+            }
+
+            // Find ALL Enter Buttons on screen (both variants)
+            var allButtons = new List<System.Drawing.Rectangle>();
+            allButtons.AddRange(_locator.FindAll(screen, NavigationAssets.ButtonLuxcavationEnter2, 0.85));
+            allButtons.AddRange(_locator.FindAll(screen, NavigationAssets.ButtonLuxcavationEnter3, 0.85));
+
+            // Filter for the button that matches the Text's ROW.
+            // Text Height ~25px. We allow a margin.
+            int textMidY = bestLevelRect.Y + bestLevelRect.Height / 2;
+            int toleranceY = 25; // +/- 25px vertical tolerance
+
+            System.Drawing.Rectangle bestBtn = System.Drawing.Rectangle.Empty;
+            double minDistanceX = double.MaxValue;
+
+            foreach (var btn in allButtons)
+            {
+                int btnMidY = btn.Y + btn.Height / 2;
+                if (Math.Abs(btnMidY - textMidY) < toleranceY)
+                {
+                    // This button is in the same row.
+                    // Pick the closest one X-wise (usually there's only one to the right, but just in case)
+                    // We typically expect Button X > Text X
+                    double dist = Math.Abs(btn.X - bestLevelRect.X);
+                    if (dist < minDistanceX)
+                    {
+                        minDistanceX = dist;
+                        bestBtn = btn;
+                    }
+                }
+            }
+            
+            if (!bestBtn.IsEmpty)
+            {
+                Console.WriteLine($"[Luxcavation] Found Level {foundLevel}. Clicking Enter at {bestBtn} (Row Match).");
+                return _clicker.ClickLocation(bestBtn);
+            }
+            else
+            {
+                Console.WriteLine($"[Luxcavation] Found Text for {foundLevel} but NO Enter button in Row (Y~{textMidY}). Found {allButtons.Count} buttons total on screen.");
             }
 
             return false;

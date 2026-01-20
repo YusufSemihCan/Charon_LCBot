@@ -42,6 +42,16 @@ namespace Charon.Logic.Navigation
         }
 
         /// <inheritdoc />
+        public bool ClickLocation(Rectangle target)
+        {
+             if (target.IsEmpty) return false;
+             Point center = new Point(target.X + target.Width / 2, target.Y + target.Height / 2);
+             _input.MoveMouse(center, humanLike: true);
+             _input.LeftClick();
+             return true;
+        }
+
+        /// <inheritdoc />
         public bool Hover(string templateName, double threshold = 0.9)
         {
             var center = FindCenter(templateName, threshold);

@@ -57,6 +57,7 @@
                     <Button x:Name="BtnLuxEXP" Content="EXP" Width="100" Click="BtnLuxEXP_Click"/>
                     <Button x:Name="BtnLuxThread" Content="Thread" Width="100" Click="BtnLuxThread_Click"/>
                 </StackPanel>
+                <Button x:Name="BtnEnterLevel" Content="Enter Best Level" Click="BtnEnterLevel_Click" Background="#FF8C00" Foreground="Black" Width="200" Margin="5"/>
                 <Button x:Name="BtnBackFromLux" Content="Back to Drive" Click="BtnDrive_Click" Background="#5A2E0E" BorderBrush="#8B4500" Width="200" Margin="5"/>
 
                 <TextBlock Text="Mirror Dungeon" Foreground="Gray" Margin="0,15,0,5"/>

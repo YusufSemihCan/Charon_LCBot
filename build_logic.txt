@@ -1,0 +1,19 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Charon.Vision -> c:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Vision\bin\Debug\net8.0-windows\Charon.Vision.dll
+  Charon.Input -> c:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Input\bin\Debug\net8.0-windows\Charon.Input.dll
+c:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs(364,33): error CS0234: The type or namespace name 'Forms' does not exist in the namespace 'System.Windows' (are you missing an assembly reference?) [c:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Charon.Logic.csproj]
+c:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs(364,24): error CS1061: 'IInputService' does not contain a definition for 'KeyPress' and no accessible extension method 'KeyPress' accepting a first argument of type 'IInputService' could be found (are you missing a using directive or an assembly reference?) [c:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Charon.Logic.csproj]
+c:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs(445,33): error CS1061: 'INavigationClicker' does not contain a definition for 'ClickLocation' and no accessible extension method 'ClickLocation' accepting a first argument of type 'INavigationClicker' could be found (are you missing a using directive or an assembly reference?) [c:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Charon.Logic.csproj]
+
+Build FAILED.
+
+c:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs(364,33): error CS0234: The type or namespace name 'Forms' does not exist in the namespace 'System.Windows' (are you missing an assembly reference?) [c:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Charon.Logic.csproj]
+c:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs(364,24): error CS1061: 'IInputService' does not contain a definition for 'KeyPress' and no accessible extension method 'KeyPress' accepting a first argument of type 'IInputService' could be found (are you missing a using directive or an assembly reference?) [c:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Charon.Logic.csproj]
+c:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs(445,33): error CS1061: 'INavigationClicker' does not contain a definition for 'ClickLocation' and no accessible extension method 'ClickLocation' accepting a first argument of type 'INavigationClicker' could be found (are you missing a using directive or an assembly reference?) [c:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Charon.Logic.csproj]
+    0 Warning(s)
+    3 Error(s)
+
+Time Elapsed 00:00:01.10
+
+Workload updates are available. Run `dotnet workload list` for more information.

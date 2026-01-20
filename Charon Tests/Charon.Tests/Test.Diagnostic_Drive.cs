@@ -48,6 +48,12 @@ namespace Charon.Tests
             var rectInActive = _locator.Find(screen, NavigationAssets.ButtonInActiveDrive, 0.7, false);
             if (!rectInActive.IsEmpty) Console.WriteLine($"[SUCCESS] Found {NavigationAssets.ButtonInActiveDrive} at {rectInActive}");
             else Console.WriteLine($"[FAILURE] Did NOT find {NavigationAssets.ButtonInActiveDrive} (Threshold 0.7)");
+
+            // Check InActive Window Button (Drive -> Window Transition)
+            Console.WriteLine($"Checking {NavigationAssets.ButtonInActiveWindow}...");
+            var rectInActiveWin = _locator.Find(screen, NavigationAssets.ButtonInActiveWindow, 0.7, false);
+            if (!rectInActiveWin.IsEmpty) Console.WriteLine($"[SUCCESS] Found {NavigationAssets.ButtonInActiveWindow} at {rectInActiveWin}");
+            else Console.WriteLine($"[FAILURE] Did NOT find {NavigationAssets.ButtonInActiveWindow} (Threshold 0.7)");
             
             // --- LUXCAVATION CHECKS ---
             Console.WriteLine("--- Checking Luxcavation Assets ---");

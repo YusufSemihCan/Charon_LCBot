@@ -33,6 +33,11 @@ namespace Charon.Vision
         Rectangle Find(Image<Bgr, byte> screen, string templateName, double threshold = 0.9, bool useEdges = false);
 
         /// <summary>
+        /// Finds ALL occurrences of the template.
+        /// </summary>
+        List<Rectangle> FindAll(Image<Bgr, byte> screen, string templateName, double threshold = 0.9);
+
+        /// <summary>
         /// Performs OCR on a specific region of a Grayscale image.
         /// </summary>
         string Read(Image<Gray, byte> screen, Rectangle area);

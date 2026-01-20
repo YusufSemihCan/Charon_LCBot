@@ -39,7 +39,12 @@ namespace Charon.Logic.Navigation
         void PressKey(VirtualKey key, int holdTime = 20);
 
         /// <summary>
-        /// Presses ESC to dismiss popups or menus.
+        /// Clicks a specific screen location (Rectangle center).
+        /// </summary>
+        bool ClickLocation(System.Drawing.Rectangle target);
+        
+        /// <summary>
+        /// Dismisses a menu by pressing ESC.
         /// </summary>
         void DismissWithEsc();
     }

@@ -113,7 +113,7 @@ namespace Charon.Tests
             var luxRect = new Rectangle(0,0,10,10);
             
              // Fix: Logic uses Gray/Color for active button as primary check if panel missing
-             _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonActiveLuxcavationEXP, It.IsAny<double>(), It.IsAny<bool>()))
+             _mockLocator.Setup(l => l.Find(It.IsAny<Image<Bgr, byte>>(), NavigationAssets.ButtonActiveLuxcavationEXP, It.IsAny<double>(), It.IsAny<bool>()))
                          .Returns(() => luxChecks++ < 1 ? Rectangle.Empty : luxRect);
 
             _mockClicker.Setup(c => c.ClickTemplate(NavigationAssets.ButtonLuxcavation, It.IsAny<double>())).Returns(true);
@@ -138,8 +138,8 @@ namespace Charon.Tests
             var luxRect = new Rectangle(0,0,10,10);
 
             // Fix: Logic uses Gray/Color
-            _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonActiveLuxcavationEXP, It.IsAny<double>(), It.IsAny<bool>()))
-                        .Returns(() => luxChecks++ < 1 ? luxRect : Rectangle.Empty);
+            _mockLocator.Setup(l => l.Find(It.IsAny<Image<Bgr, byte>>(), NavigationAssets.ButtonActiveLuxcavationEXP, It.IsAny<double>(), It.IsAny<bool>()))
+            .Returns(() => luxChecks++ < 1 ? luxRect : Rectangle.Empty);
             
             // End: Drive Found (Gray) - Always found (Background)
             _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonActiveDrive, It.IsAny<double>(), It.IsAny<bool>())).Returns(new Rectangle(0,0,10,10));
@@ -175,7 +175,7 @@ namespace Charon.Tests
             // End: Drive Found (Gray) - Always found
             _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonActiveDrive, It.IsAny<double>(), It.IsAny<bool>())).Returns(new Rectangle(0,0,10,10));
 
-            _mockClicker.Setup(c => c.ClickTemplate(NavigationAssets.ButtonBack, It.IsAny<double>())).Returns(true);
+            _mockClicker.Setup(c => c.ClickTemplate(NavigationAssets.ButtonBackMirrorDungeon, It.IsAny<double>())).Returns(true);
              
             // Act
             bool success = _navigation.NavigateTo(NavigationState.Drive);
@@ -211,14 +211,14 @@ namespace Charon.Tests
 
 
         
-        [Test, Explicit("Flaky mock sequence logic")]
+        [Test]
         [Description("Verifies chained navigation from Luxcavation to Window. Includes exiting Luxcavation.")]
         public void NavigateTo_LuxcavationToWindow()
         {
             _mockLocator.Reset();
             var rect = new Rectangle(0,0,10,10);
 
-            // 1. Luxcavation Logic
+            // 1. Luxcavation Logic (Active detected via Bgr)
             // Sync 1 (Start): Found.
             // Sync 2 (Post Esc): Empty.
             // Sync 3+ (Post Click Window): Empty.
@@ -228,27 +228,31 @@ namespace Charon.Tests
                         .Returns(Rectangle.Empty)
                         .Returns(Rectangle.Empty);
 
-            // 2. Drive Logic
+            // 2. Drive Logic (Active detected via Gray)
             // Sync 1 (Start): Empty.
             // Sync 2 (Post Esc): Found (Arrive Drive). State=Drive.
             // Sync 3 (Post Click Window): Found (Drive still visible? Or Empty if fast?). 
             // We'll return Rect to be safe. Priority 1 (Window) should override it if Window is found.
             // If Window not found yet, we prefer Drive.
-            _mockLocator.SetupSequence(l => l.Find(It.IsAny<Image<Bgr, byte>>(), NavigationAssets.ButtonActiveDrive, It.IsAny<double>(), It.IsAny<bool>()))
-                        .Returns(Rectangle.Empty)
+            
+            // 2. Drive Logic (Active detected via Gray)
+            // Sync 1 (Start): Skipped (Lux Found).
+            // Sync 2 (Post Esc): Found (Arrive Drive). State=Drive.
+            // Sync 3 (Post Click Window): Found.
+            _mockLocator.SetupSequence(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonActiveDrive, It.IsAny<double>(), It.IsAny<bool>()))
                         .Returns(rect)
                         .Returns(rect)
                         .Returns(rect)
                         .Returns(rect);
 
-            // 3. Window Logic
-            // Sync 1: Empty.
-            // Sync 2: Empty.
-            // Sync 3: Found (Arrive Window). State=Window.
-            _mockLocator.SetupSequence(l => l.Find(It.IsAny<Image<Bgr, byte>>(), NavigationAssets.ButtonActiveWindow, It.IsAny<double>(), It.IsAny<bool>()))
+            // 3. Window Logic (Active detected via Gray)
+            // Sync 1: Skipped (Lux Found).
+            // Sync 2: Empty (Finding Drive).
+            // Sync 3: Empty (Loop Check).
+            // Sync 4: Found (Arrive Window).
+            _mockLocator.SetupSequence(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonActiveWindow, It.IsAny<double>(), It.IsAny<bool>()))
                         .Returns(Rectangle.Empty)
                         .Returns(Rectangle.Empty)
-                        .Returns(rect)
                         .Returns(rect);
 
             // Clicks
@@ -263,38 +267,40 @@ namespace Charon.Tests
             _mockClicker.Verify(c => c.ClickTemplate(NavigationAssets.ButtonInActiveWindow, It.IsAny<double>()), Times.Once);
         }
 
-        [Test, Explicit("Flaky mock sequence logic")]
+        [Test]
         [Description("Verifies chained navigation from Window to Luxcavation (via Drive).")]
         public void NavigateTo_WindowToLuxcavation()
         {
              _mockLocator.Reset();
              var rect = new Rectangle(0,0,10,10);
 
-             // 1. Window Anchors
+             // 1. Window Anchors (Gray)
              // Sync 1 (Start): Found. State=Window.
              // Sync 2 (Post Click Drive): Empty.
              // Sync 3+: Empty.
-             _mockLocator.SetupSequence(l => l.Find(It.IsAny<Image<Bgr, byte>>(), NavigationAssets.ButtonActiveWindow, It.IsAny<double>(), It.IsAny<bool>()))
+             _mockLocator.SetupSequence(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonActiveWindow, It.IsAny<double>(), It.IsAny<bool>()))
                          .Returns(rect)
                          .Returns(Rectangle.Empty)
                          .Returns(Rectangle.Empty)
                          .Returns(Rectangle.Empty);
 
-             // 2. Drive Anchors
-             // Sync 1 (Start): Empty.
+             // 2. Drive Anchors (Gray)
+             // Sync 1 (Start): Skipped (Window Found).
              // Sync 2 (Post Click Drive): Found. State=Drive.
-             // Sync 3 (Post Click Lux): Empty (Left Drive).
-             _mockLocator.SetupSequence(l => l.Find(It.IsAny<Image<Bgr, byte>>(), NavigationAssets.ButtonActiveDrive, It.IsAny<double>(), It.IsAny<bool>()))
-                         .Returns(Rectangle.Empty)
+             // Sync 3 (Post Click Lux): Found (Loop Check).
+             _mockLocator.SetupSequence(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonActiveDrive, It.IsAny<double>(), It.IsAny<bool>()))
                          .Returns(rect)
-                         .Returns(Rectangle.Empty)
+                         .Returns(rect)
                          .Returns(Rectangle.Empty);
 
              // 3. Luxcavation Anchors
              // Sync 1: Empty.
              // Sync 2: Empty.
-             // Sync 3: Found. State=LuxEXP.
+             // Sync 3: Empty (Loop Check - Finding Drive here).
+             // Sync 4: Found (After Drive->Lux click).
+             // Sync 5: Found (Loop Check - Confirm Arrival).
              _mockLocator.SetupSequence(l => l.Find(It.IsAny<Image<Bgr, byte>>(), NavigationAssets.ButtonActiveLuxcavationEXP, It.IsAny<double>(), It.IsAny<bool>()))
+                         .Returns(Rectangle.Empty)
                          .Returns(Rectangle.Empty)
                          .Returns(Rectangle.Empty)
                          .Returns(rect)

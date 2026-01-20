@@ -20,6 +20,9 @@ The primary class for handling image recognition and text reading.
         -   **Grayscale Search**: Fast, robust, low RAM usage.
         -   **Color Search**: Precise (e.g., distinguishing Red vs Blue), higher RAM usage.
         -   **Edge Detection**: Optional Canny edge detection for structural matching.
+    -   `FindAll(screen, template, threshold)`: Finds **all** occurrences of a template on the screen.
+        -   Returns a `List<Rectangle>`.
+        -   Useful for finding multiple buttons or items in a list.
     -   `Read(image, area)`: Extracts text from a specified region.
         -   Includes automatic binarization/thresholding for better accuracy.
         -   Supports both Grayscale and Color inputs (converts Color to Gray automatically).

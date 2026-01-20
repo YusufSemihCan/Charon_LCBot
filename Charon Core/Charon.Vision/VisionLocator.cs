@@ -296,6 +296,77 @@ namespace Charon.Vision
             return Rectangle.Empty;
         }
 
+        /// <inheritdoc />
+        public List<Rectangle> FindAll(Image<Bgr, byte> screen, string templateName, double threshold = 0.9)
+        {
+            var matches = new List<Rectangle>();
+            if (!_filePaths.ContainsKey(templateName)) return matches;
+
+            Image<Bgr, byte> template = LoadAndScale<Bgr, byte>(_filePaths[templateName]);
+            // Cache logic simplified for FindAll (always load or use simplified cache)
+            // For now, straightforward implementation:
+            
+            using (var result = screen.MatchTemplate(template, Emgu.CV.CvEnum.TemplateMatchingType.CcoeffNormed))
+            {
+                // To find ALL, we need to threshold the result map.
+                // This is expensive to iterate manually.
+                // Optimization: Use Threshold binary
+                // But Emgu generic MinMax only gives absolute max.
+                // We iterate until max < threshold.
+                
+                // Working on a copy of result is needed to mask out previous matches
+                using(var resultCopy = result.Clone())
+                {
+                    while(true)
+                    {
+                        resultCopy.MinMax(out _, out double[] maxValues, out _, out Point[] maxLocations);
+                        if (maxValues[0] >= threshold)
+                        {
+                            var rect = new Rectangle(maxLocations[0], template.Size);
+                            matches.Add(rect);
+                            
+                            // Mask out this area in resultCopy to find next
+                            // Fill rectangle with -1 (lowest possible correlation)
+                            // CvInvoke.Rectangle(resultCopy, rect, new MCvScalar(-1), -1); 
+                            // Note: resultCopy is a Matrix/Image<Gray, float>. 
+                            // We need to set pixel values.
+                            // Basic approach: Flood fill or set ROI. 
+                            // Setting ROI and SetZero is easier? No, setting ROI limits operation.
+                            // We construct a filled rectangle mask.
+                            
+                            // Simple Masking:
+                            int margin = 5; // Minimal overlap prevention
+                            var maskRect = rect;
+                            maskRect.Inflate(-margin, -margin); // Slightly smaller to allow overlapping edges? Or larger to prevent duplicates?
+                            // Usually larger to prevent re-finding the same peak neighbor.
+                            maskRect.Inflate(margin * 2, margin * 2);
+                            
+                            // Bounds check
+                            maskRect.Intersect(new Rectangle(Point.Empty, resultCopy.Size));
+                            
+                            if (maskRect.IsEmpty) break;
+
+                            resultCopy.GetSubRect(maskRect).SetValue(new Gray(-1.0));
+                        }
+                        else
+                        {
+                            break;
+                        }
+                        
+                        if (matches.Count > 20) break; // Safety limit
+                    }
+                }
+            }
+            
+            // Dispose template if not cached (simplified logic compared to Find)
+             if (!_colorCache.ContainsKey(templateName) && _mode != CacheMode.Speed)
+             {
+                 template.Dispose();
+             }
+
+            return matches;
+        }
+
         private Image<TColor, TDepth> LoadAndScale<TColor, TDepth>(string path)
             where TColor : struct, IColor
             where TDepth : new()

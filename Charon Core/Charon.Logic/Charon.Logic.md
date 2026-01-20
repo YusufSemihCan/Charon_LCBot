@@ -54,10 +54,17 @@ All visual assets keys are stored in `NavigationAssets.cs`. This separates the "
 `VisionLocator` now recursively scans the `Assets` folder (e.g., `Assets/Navigation/Text`), allowing for organized folder structures without code changes.
 
 **Luxcavation Logic**
-Luxcavation logic now supports distinct **Active** and **Inactive** button states for robust tab detection.
-- **State Detection**: Uses `Button_Active_...` to confirm the current tab.
-- **Transition**: Clicks `Button_InActive_...` to switch tabs.
-- **Back Navigation**: Uses the generic `ButtonBack` to return to Drive.
+Luxcavation logic now supports distinct **Active** and **Inactive** button states for robust tab detection, and intelligent level selection.
+-   **State Detection**: Uses `Button_Active_...` to confirm the current tab.
+-   **Transition**: Clicks `Button_InActive_...` to switch tabs.
+-   **Level Selection (v1.1)**:
+    -   Scans levels 9 down to 1 (`EnterLuxcavationLevel`).
+    -   Uses `FindAll` to detect all "Enter" buttons.
+    -   Selects the button strictly **row-aligned** with the target level text.
+-   **Battle Entry**:
+    -   Detects `ToBattle` transition state.
+    -   Presses `Enter` key (VirtualKey) to start combat.
+-   **Back Navigation**: Prioritizes `ESC` key, falls back to generic `ButtonBack`.
 
 **Charge Menu Logic**
 Charge state detection relies on **Active** (Yellow) buttons to identify the current tab.

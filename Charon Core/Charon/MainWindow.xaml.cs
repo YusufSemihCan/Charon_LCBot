@@ -40,6 +40,7 @@ namespace Charon
         
         private async void BtnLuxEXP_Click(object sender, RoutedEventArgs e) => await RunNav(NavigationState.Luxcavation_EXP);
         private async void BtnLuxThread_Click(object sender, RoutedEventArgs e) => await RunNav(NavigationState.Luxcavation_Thread);
+        private async void BtnEnterLevel_Click(object sender, RoutedEventArgs e) => await RunNav(NavigationState.ToBattle);
         
         private async void BtnMD_Click(object sender, RoutedEventArgs e) => await RunNav(NavigationState.MirrorDungeon);
         private async void BtnMDDelving_Click(object sender, RoutedEventArgs e) => await RunNav(NavigationState.MirrorDungeon_Delving);

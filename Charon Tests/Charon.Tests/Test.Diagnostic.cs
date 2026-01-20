@@ -25,8 +25,9 @@ namespace Charon.Tests
         public void Diagnose_LuxcavationEXP_Detection()
         {
             // Load real screenshot
-            string ssPath = Path.Combine(_assetsPath, "SS_LuxcavationEXP.png");
-            if (!File.Exists(ssPath)) { Assert.Ignore($"Screenshot SS_LuxcavationEXP.png not found at {ssPath}"); return; }
+            // Load real screenshot
+            string ssPath = Path.Combine(_assetsPath, "Navigation", "Screen Resolution", "SR_LuxcavationEXP_3.png");
+            if (!File.Exists(ssPath)) { Assert.Ignore($"Screenshot SR_LuxcavationEXP_3.png not found at {ssPath}"); return; }
 
             using var screen = new Image<Gray, byte>(ssPath);
 
@@ -43,11 +44,10 @@ namespace Charon.Tests
             }
         }
 
-        [Test]
         public void Diagnose_LuxcavationThread_Detection()
         {
-            string ssPath = Path.Combine(_assetsPath, "SS_LuxcavationThread.png");
-            if (!File.Exists(ssPath)) { Assert.Ignore($"Screenshot SS_LuxcavationThread.png not found at {ssPath}"); return; }
+            string ssPath = Path.Combine(_assetsPath, "Navigation", "Screen Resolution", "SR_LuxcavationThread.png");
+            if (!File.Exists(ssPath)) { Assert.Ignore($"Screenshot SR_LuxcavationThread.png not found at {ssPath}"); return; }
 
             using var screen = new Image<Gray, byte>(ssPath);
 

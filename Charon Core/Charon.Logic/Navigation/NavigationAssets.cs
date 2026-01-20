@@ -28,6 +28,10 @@
         MirrorDungeon,
         MirrorDungeon_Delving,
         
+        // Battle Entry
+        ToBattle,        // Pre-battle screen (Enter/Back)
+        Battle,          // The actual battle
+        
         Success          // Generic Success screen
     }
 
@@ -66,15 +70,34 @@
         public const string ButtonActiveLuxcavationThread = "Button_A_Luxcavation_Thread";
         public const string ButtonInActiveLuxcavationThread = "Button_I_Luxcavation_Thread";
 
-        // Text Anchors (Restored for Build)
-        public const string TextLuxcavationEXP = "Text_LuxcavationEXP_Stage"; // Placeholder or actual filename if known
-        public const string TextLuxcavationThread = "Text_LuxcavationThread"; // Matches partial file 'Text_LuxcavationThread.png' found earlier
-        
         // Legacy keys mapped for compatibility (or update logic to use specific ones)
         // Used for Clicking: We typically click the inactive one to switch.
+        public const string TextLuxcavationEXP = "Text_LuxcavationEXP_Stage"; // Placeholder
+        public const string TextLuxcavationThread = "Text_LuxcavationThread"; 
+        
+        // Legacy Mappings (Restored)
         public const string ButtonLuxcavationEXP = ButtonInActiveLuxcavationEXP;       
         public const string ButtonLuxcavationThread = ButtonInActiveLuxcavationThread;
+
+        // Luxcavation EXP Levels
+        public const string TextLuxcavationLevel1 = "Text_LuxcavationEXP_Level-1";
+        public const string TextLuxcavationLevel2 = "Text_LuxcavationEXP_Level-2";
+        public const string TextLuxcavationLevel3 = "Text_LuxcavationEXP_Level-3";
+        public const string TextLuxcavationLevel4 = "Text_LuxcavationEXP_Level-4";
+        public const string TextLuxcavationLevel5 = "Text_LuxcavationEXP_Level-5";
+        public const string TextLuxcavationLevel6 = "Text_LuxcavationEXP_Level-6";
+        public const string TextLuxcavationLevel7 = "Text_LuxcavationEXP_Level-7";
+        public const string TextLuxcavationLevel8 = "Text_LuxcavationEXP_Level-8";
+        public const string TextLuxcavationLevel9 = "Text_LuxcavationEXP_Level-9";
+
+        // Luxcavation Enter Buttons (Use closest Y match)
+        // Note: Filenames are Button_LuxcavationEXP_Enter_2 and _3, but logic should probably trying to match any "Enter" looking button in that zone.
+        // We will define the base template names.
+        public const string ButtonLuxcavationEnter2 = "Button_LuxcavationEXP_Enter_2"; 
+        public const string ButtonLuxcavationEnter3 = "Button_LuxcavationEXP_Enter_3";
         
+        // ToBattle
+        public const string IconToBattle = "Icons_ToBattle_Identifier";      
         public const string ButtonMirrorDungeon = "Button_MirrorDungeon";
         public const string ButtonMDEnter = "Button_MirrorDungeon_Enter";
         
@@ -102,18 +125,7 @@
         
         public const string ButtonActiveChargeLunacy = "Button_A_Charge_Lunacy";
         public const string ButtonInActiveChargeLunacy = "Button_I_Charge_Lunacy";
-        
-        // Legacy/Generic (Can map to InActive for clicking if needed)
-        public const string ChargeBoxes = ButtonInActiveChargeBoxes;
-        public const string ChargeModules = ButtonInActiveChargeModules;
-        public const string ChargeLunacy = ButtonInActiveChargeLunacy;
 
-        public const string EnkephalinBox = "Icon_EnkehpalinBox"; // Note: Typo in filename 'Enkehpalin'
-
-        public const string NumberDialTransparent = "NumberDialTransparent";
-        public const string NumberDialTransparentDecrement = "NumberDialTransparent_Decrement";
-        public const string NumberDialTransparentIncrement = "NumberDialTransparent_Increment";
-        public const string NumberDialTransparentMaximize = "NumberDialTransparent_Maximize";
-        public const string NumberDialTransparentMinimize = "NumberDialTransparent_Minimize";
+        public const string EnkephalinBox = "Icon_EnkephalinBox";
     }
 }

@@ -13,6 +13,7 @@
 -   **Role**: Main Control Panel.
 -   **Key Controls**:
     -   **Start/Stop Button**: Toggles the automation logic execution.
+    -   **Enter Best Level**: (Debug) Triggers the Luxcavation Level Selection and Battle Entry logic for verification.
     -   **Status Log (`TextBox`)**: Displays real-time log messages from the bot logic.
 -   **Architecture**:
     -   **Service Integration**: Instantiates `VisionService` and `InputService` (currently direct instantiation, structured for Dependency Injection).
