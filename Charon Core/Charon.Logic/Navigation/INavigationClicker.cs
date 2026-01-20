@@ -9,6 +9,11 @@ namespace Charon.Logic.Navigation
     public interface INavigationClicker
     {
         /// <summary>
+        /// Gets or sets whether mouse movement should simulate human-like curves and delays.
+        /// </summary>
+        bool HumanLikeMovement { get; set; }
+
+        /// <summary>
         /// Finds a template and clicks it.
         /// </summary>
         bool ClickTemplate(string templateName, double threshold = 0.9);
@@ -47,5 +52,15 @@ namespace Charon.Logic.Navigation
         /// Dismisses a menu by pressing ESC.
         /// </summary>
         void DismissWithEsc();
+        
+        /// <summary>
+        /// Moves the mouse to a safe position to avoid obscuring the screen.
+        /// </summary>
+        void ClearCursor();
+        
+        /// <summary>
+        /// Gets or sets whether to automatically clear the cursor before scanning.
+        /// </summary>
+        bool AutoClearCursor { get; set; }
     }
 }

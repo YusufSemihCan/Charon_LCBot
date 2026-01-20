@@ -15,6 +15,7 @@ The primary class for handling image recognition and text reading.
 -   **Implements**: `IVisionLocator`, `IDisposable`.
 -   **Dependencies**: caching system for images (Gray/Color), Tesseract Engine.
 -   **Key Methods**:
+    -   `ScaleFactor`: Global scaling property (default 1.0) to adjust template matching for different resolutions (e.g. 0.66 for 720p).
     -   `IndexTemplates(string folder)`: Scans and loads template images (`.png`, `.jpg`, `.jpeg`, `.bmp`).
     -   `Find(screen, template, threshold, useEdges)`: Locates a template on the screen.
         -   **Grayscale Search**: Fast, robust, low RAM usage.

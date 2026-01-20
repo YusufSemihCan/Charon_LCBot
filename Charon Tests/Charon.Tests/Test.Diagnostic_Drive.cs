@@ -10,6 +10,7 @@ using System.IO;
 namespace Charon.Tests
 {
     [TestFixture]
+    [Explicit("Diagnostic/Integration tests requiring visual environment")]
     public class Test_Diagnostic_Drive
     {
         private VisionService _vision = null!;

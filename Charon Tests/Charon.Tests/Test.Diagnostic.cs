@@ -10,6 +10,7 @@ using Charon.Logic.Navigation;
 namespace Charon.Tests
 {
     [TestFixture]
+    [Explicit("Diagnostic/Integration tests requiring visual environment")]
     public class Test_Diagnostic
     {
         private VisionLocator _locator = null!;
@@ -62,14 +63,6 @@ namespace Charon.Tests
                      Console.WriteLine($"Button_Active_LuxcavationThread Match Score: {maxValues[0]}");
                  }
              }
-        }
-
-
-        [Test]
-        public void Diagnose_Drive_Text()
-        {
-             // Text assets removed by user. 
-             Assert.Ignore("Text assets removed.");
         }
 
         [Test]

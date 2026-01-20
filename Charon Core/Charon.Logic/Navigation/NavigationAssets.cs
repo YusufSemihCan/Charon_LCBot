@@ -16,7 +16,6 @@
 
         // Sub-menus (Charge)
         Charge,
-        Charge_Boxes,
         Charge_Modules,
         Charge_Lunacy,
 
@@ -26,6 +25,7 @@
 
         // Mirror Dungeon (MD)
         MirrorDungeon,
+        MirrorDungeon_Confirmation,
         MirrorDungeon_Delving,
         
         // Battle Entry
@@ -105,6 +105,9 @@
         public const string ButtonInActiveMDInfinityMirror = "Button_I_MirrorDungeon_InfinityMirror";
         public const string ButtonMDS6 = "Button_MirrorDungeon_S6"; // Season 6 Banner?
 
+        public const string ButtonMirrorDungeonRental = "Button_MirrorDungeon_Rental";
+        public const string TextMirrorDungeonConfirmation = "Text_MirrorDungeon_Confirmation";
+
         public const string MDDungeonProgress = "MD_DungeonProgress";
         public const string MDStarlightCount = "MD_StarlightCount";
         public const string MDStarlightIcon = "MD_StarlightIcon";
@@ -115,11 +118,18 @@
         
         public const string ButtonChargeConfirm = ButtonConfirm; // Map to generic
         public const string ButtonChargeCancel = ButtonCancel;   // Map to generic
+
+        public const string ButtonLuxcavationThreadEnter = "Button_LuxcavationThread_Enter";
+        public const string ButtonLuxcavationThreadLevelEnter = "Button_LuxcavationThread_Level_Enter";
+        
+        // Luxcavation Thread Levels (Popup)
+        public const string TextLuxcavationThreadLevel60 = "Text_LuxcavationThread_Level-60";
+        public const string TextLuxcavationThreadLevel50 = "Text_LuxcavationThread_Level-50";
+        public const string TextLuxcavationThreadLevel40 = "Text_LuxcavationThread_Level-40";
+        public const string TextLuxcavationThreadLevel30 = "Text_LuxcavationThread_Level-30";
+        public const string TextLuxcavationThreadLevel20 = "Text_LuxcavationThread_Level-20";
         
         // Active/InActive Tabs for Charge
-        public const string ButtonActiveChargeBoxes = "Button_A_Charge_Boxes";
-        public const string ButtonInActiveChargeBoxes = "Button_I_Charge_Boxes";
-        
         public const string ButtonActiveChargeModules = "Button_A_Charge_Modules";
         public const string ButtonInActiveChargeModules = "Button_I_Charge_Modules";
         

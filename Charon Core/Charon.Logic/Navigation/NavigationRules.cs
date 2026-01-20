@@ -69,12 +69,20 @@ namespace Charon.Logic.Navigation
                 }
             },
 
-            // --- From Mirror Dungeon ---
             {
                 NavigationState.MirrorDungeon, new List<NavigationState>
                 {
                     NavigationState.Drive,                // Back
-                    NavigationState.MirrorDungeon_Delving // Enter
+                    NavigationState.MirrorDungeon_Confirmation // Enter -> Confirmation
+                }
+            },
+            
+            // --- From Mirror Dungeon Confirmation ---
+            {
+                NavigationState.MirrorDungeon_Confirmation, new List<NavigationState>
+                {
+                    NavigationState.MirrorDungeon,        // Cancel
+                    NavigationState.MirrorDungeon_Delving // Enter (Confirm)
                 }
             },
             
@@ -116,23 +124,12 @@ namespace Charon.Logic.Navigation
                     NavigationState.Window, // Close/Back
                     NavigationState.Drive,
                     NavigationState.Sinners,
-                    NavigationState.Charge_Boxes,
+
                     NavigationState.Charge_Modules,
                     NavigationState.Charge_Lunacy
                 }
             },
-            {
-                NavigationState.Charge_Boxes, new List<NavigationState>
-                {
-                    NavigationState.Window,
-                    NavigationState.Drive,
-                    NavigationState.Sinners,
-                    NavigationState.Luxcavation_EXP,
-                    NavigationState.Luxcavation_Thread,
-                    NavigationState.Charge_Modules,
-                    NavigationState.Charge_Lunacy
-                }
-            },
+
             {
                 NavigationState.Charge_Modules, new List<NavigationState>
                 {
@@ -141,7 +138,7 @@ namespace Charon.Logic.Navigation
                     NavigationState.Sinners,
                     NavigationState.Luxcavation_EXP,
                     NavigationState.Luxcavation_Thread,
-                    NavigationState.Charge_Boxes,
+
                     NavigationState.Charge_Lunacy
                 }
             },
@@ -153,7 +150,7 @@ namespace Charon.Logic.Navigation
                     NavigationState.Sinners,
                     NavigationState.Luxcavation_EXP,
                     NavigationState.Luxcavation_Thread,
-                    NavigationState.Charge_Boxes,
+
                     NavigationState.Charge_Modules
                 }
             }

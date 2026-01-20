@@ -23,12 +23,16 @@ Charon employs a sophisticated navigation engine capable of handling complex UI 
 - **Main Zones**: Window (Dashboard), Drive (Bus), Sinners (Management).
 - **Luxcavation**: 
   - Automated entry and type selection (EXP vs Thread).
+  - **Smart Level Selection**: Automatically scans and selects the highest available Thread Level (60 -> 20).
   - Uses **Color Matching** to distinguish active tabs (Yellow) from inactive ones.
 - **Mirror Dungeon**:
   - Handles entry, resume, and confirmation popups.
 - **Charge Menu**:
   - Direct access to specific sub-tabs (Boxes, Modules, Lunacy).
   - Intelligent exit strategies using `ESC` or Back buttons.
+- **Settings & Human-Like Behavior**:
+  - toggle explicitly for "Human-Like" smooth mouse movement vs instant teleportation.
+  - "Auto-Clear Cursor" to prevent vision obstruction.
 
 ### Manual Test UI
 The application includes a `MainWindow` dashboard for developers to:

@@ -58,7 +58,8 @@ Luxcavation logic now supports distinct **Active** and **Inactive** button state
 -   **State Detection**: Uses `Button_Active_...` to confirm the current tab.
 -   **Transition**: Clicks `Button_InActive_...` to switch tabs.
 -   **Level Selection (v1.1)**:
-    -   Scans levels 9 down to 1 (`EnterLuxcavationLevel`).
+    -   **EXP**: Scans levels 9 down to 1 (`EnterLuxcavationLevel`).
+    -   **Thread**: Scans levels 60 down to 20 (`EnterLuxcavationThreadLevel`).
     -   Uses `FindAll` to detect all "Enter" buttons.
     -   Selects the button strictly **row-aligned** with the target level text.
 -   **Battle Entry**:

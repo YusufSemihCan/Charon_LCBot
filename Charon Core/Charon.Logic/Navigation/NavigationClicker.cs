@@ -19,13 +19,24 @@ namespace Charon.Logic.Navigation
             _input = input ?? throw new ArgumentNullException(nameof(input));
         }
 
+        public bool HumanLikeMovement { get; set; } = true;
+        public bool AutoClearCursor { get; set; } = true;
+
+        /// <inheritdoc />
+        public void ClearCursor()
+        {
+            // Move to Top-Left safely (0, 0)
+            // Using small offset (10, 10) to avoid triggering edge gestures on some systems?
+            _input.MoveMouse(new Point(0, 0), humanLike: HumanLikeMovement); 
+        }
+
         /// <inheritdoc />
         public bool ClickTemplate(string templateName, double threshold = 0.9)
         {
             var center = FindCenter(templateName, threshold);
             if (center == Point.Empty) return false;
 
-            _input.MoveMouse(center, humanLike: true);
+            _input.MoveMouse(center, humanLike: HumanLikeMovement);
             _input.LeftClick();
             return true;
         }
@@ -36,7 +47,7 @@ namespace Charon.Logic.Navigation
             var center = FindCenter(templateName, threshold);
             if (center == Point.Empty) return false;
 
-            _input.MoveMouse(center, humanLike: true);
+            _input.MoveMouse(center, humanLike: HumanLikeMovement);
             _input.LeftClick(durationMs);
             return true;
         }
@@ -46,7 +57,7 @@ namespace Charon.Logic.Navigation
         {
              if (target.IsEmpty) return false;
              Point center = new Point(target.X + target.Width / 2, target.Y + target.Height / 2);
-             _input.MoveMouse(center, humanLike: true);
+             _input.MoveMouse(center, humanLike: HumanLikeMovement);
              _input.LeftClick();
              return true;
         }
