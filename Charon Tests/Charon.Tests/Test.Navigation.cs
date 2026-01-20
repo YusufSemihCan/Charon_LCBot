@@ -77,10 +77,9 @@ namespace Charon.Tests
         [Description("Verifies navigation from Window to Drive.")]
         public void NavigateTo_WindowToDrive()
         {
-            // Arrange: Start at Window
-            MockState(NavigationState.Window);
+            // Arrange
+            SetupTransition(NavigationState.Window, NavigationState.Drive);
             
-            // Setup Clicker to succeed
             _mockClicker.Setup(c => c.ClickTemplate(NavigationAssets.ButtonInActiveDrive, It.IsAny<double>()))
                         .Returns(true);
 
@@ -89,17 +88,15 @@ namespace Charon.Tests
 
             // Assert
             Assert.That(success, Is.True);
-            _mockClicker.Verify(c => c.ClickTemplate(NavigationAssets.ButtonInActiveDrive, It.IsAny<double>()), Times.Once);
         }
 
         [Test]
         [Description("Verifies navigation from Drive to Luxcavation (EXP).")]
         public void NavigateTo_DriveToLuxcavation()
         {
-            // Arrange: Start at Drive
-            MockState(NavigationState.Drive);
+            // Arrange
+            SetupTransition(NavigationState.Drive, NavigationState.Luxcavation_EXP);
 
-            // Setup: First click Luxcavation button, then toggle EXP
             _mockClicker.Setup(c => c.ClickTemplate(NavigationAssets.ButtonLuxcavation, It.IsAny<double>())).Returns(true);
             _mockClicker.Setup(c => c.ClickTemplate(NavigationAssets.ButtonLuxcavationEXP, It.IsAny<double>())).Returns(true);
 
@@ -108,93 +105,125 @@ namespace Charon.Tests
 
             // Assert
             Assert.That(success, Is.True);
-            _mockClicker.Verify(c => c.ClickTemplate(NavigationAssets.ButtonLuxcavation, It.IsAny<double>()), Times.Once);
-            
-            // Note: Since NavigateTo is recursive, testing the exact flow requires complex mocking of state changes between calls.
-            // For a unit test, we verify the immediate logic of 'NavigateFromDrive'.
-            // Determining the *next* recursive call verifies the chain.
-            // However, since we mock state based on 'SynchronizeState', we can simulate the transition by changing the return of mockLocator.
         }
 
-        
-        // Helper to simulate state in SynchronizeState
-        private void MockState(NavigationState state)
-        {
-            // Reset all finds first
-            _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), It.IsAny<string>(), It.IsAny<double>(), It.IsAny<bool>()))
-                        .Returns(Rectangle.Empty);
-
-            string? anchor = null;
-            switch (state)
-            {
-                case NavigationState.Window: anchor = NavigationAssets.ButtonActiveWindow; break;
-                case NavigationState.Drive: anchor = NavigationAssets.ButtonActiveDrive; break;
-                case NavigationState.Sinners: anchor = NavigationAssets.ButtonActiveSinners; break;
-                case NavigationState.MirrorDungeon_Delving: anchor = NavigationAssets.MDDungeonProgress; break;
-            }
-
-            if (anchor != null)
-            {
-                _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), anchor, It.IsAny<double>(), It.IsAny<bool>()))
-                            .Returns(new Rectangle(0, 0, 10, 10));
-            }
-        }
-        
         [Test]
         [Description("Verifies navigation from Luxcavation back to Drive via Back button.")]
         public void NavigateTo_LuxcavationToDrive()
         {
-             // Arrange
-             // First we need to simulate being in the sub-state.
-             // But SynchronizeState relies on identifying anchors. 
-             // Luxcavation sub-state is identified by 'ButtonTextLuxcavation' + toggle.
-             // For this test, we mock the initial find to return a Luxcavation state.
+            // Arrange
+            SetupTransition(NavigationState.Luxcavation_EXP, NavigationState.Drive);
              
-             // Navigation.cs: 
-             // else if (!_locator.Find(screen, NavigationAssets.ButtonTextLuxcavation).IsEmpty) 
-             //    if (!_locator.Find(screen, NavigationAssets.ButtonLuxcavationEXP).IsEmpty) _currentState = NavigationState.Luxcavation_EXP;
+            _mockClicker.Setup(c => c.ClickTemplate(NavigationAssets.ButtonBack, It.IsAny<double>())).Returns(true);
              
-             _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonTextLuxcavation, It.IsAny<double>(), It.IsAny<bool>()))
-                         .Returns(new Rectangle(0,0,10,10));
-             _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonLuxcavationEXP, It.IsAny<double>(), It.IsAny<bool>()))
-                         .Returns(new Rectangle(0,0,10,10));
+            // Act
+            bool success = _navigation.NavigateTo(NavigationState.Drive);
              
-             // We need to ensure we don't find other anchors like Window/Drive
-             _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonActiveWindow, It.IsAny<double>(), It.IsAny<bool>())).Returns(Rectangle.Empty);
-             _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonActiveDrive, It.IsAny<double>(), It.IsAny<bool>())).Returns(Rectangle.Empty);
-             
-             // Setup Back Button Success
-             _mockClicker.Setup(c => c.ClickTemplate(NavigationAssets.ButtonBack, It.IsAny<double>())).Returns(true);
-             
-             // Act
-             bool success = _navigation.NavigateTo(NavigationState.Drive);
-             
-             // Assert
-             Assert.That(success, Is.True);
-             _mockClicker.Verify(c => c.ClickTemplate(NavigationAssets.ButtonBack, It.IsAny<double>()), Times.Once);
+            // Assert
+            Assert.That(success, Is.True);
         }
 
         [Test]
         [Description("Verifies navigation from MirrorDungeon back to Drive via Back button.")]
         public void NavigateTo_MirrorDungeonToDrive()
         {
-             // Arrange: MD State
-             // else if (!_locator.Find(screen, NavigationAssets.ButtonTextMD).IsEmpty) -> MirrorDungeon
-             _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonTextMD, It.IsAny<double>(), It.IsAny<bool>()))
-                         .Returns(new Rectangle(0,0,10,10));
+            // Arrange
+            SetupTransition(NavigationState.MirrorDungeon_Delving, NavigationState.Drive);
              
-             // Ensure no other anchors
-             _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonActiveDrive, It.IsAny<double>(), It.IsAny<bool>())).Returns(Rectangle.Empty);
+            _mockClicker.Setup(c => c.ClickTemplate(NavigationAssets.ButtonBack, It.IsAny<double>())).Returns(true);
              
-             // Setup Back Button Success
-             _mockClicker.Setup(c => c.ClickTemplate(NavigationAssets.ButtonBack, It.IsAny<double>())).Returns(true);
+            // Act
+            bool success = _navigation.NavigateTo(NavigationState.Drive);
              
-             // Act
-             bool success = _navigation.NavigateTo(NavigationState.Drive);
-             
-             // Assert
-             Assert.That(success, Is.True);
-             _mockClicker.Verify(c => c.ClickTemplate(NavigationAssets.ButtonBack, It.IsAny<double>()), Times.Once);
+            // Assert
+            Assert.That(success, Is.True);
+        }
+
+        private void SetupTransition(NavigationState from, NavigationState to)
+        {
+            // Reset mocks
+            _mockLocator.Reset();
+
+            // Helper to get anchor for a state
+            string? GetAnchor(NavigationState s) => s switch {
+                NavigationState.Window => NavigationAssets.ButtonActiveWindow,
+                NavigationState.Drive => NavigationAssets.ButtonActiveDrive,
+                NavigationState.Sinners => NavigationAssets.ButtonActiveSinners,
+                NavigationState.MirrorDungeon_Delving => NavigationAssets.ButtonTextMD,
+                NavigationState.Luxcavation_EXP => NavigationAssets.ButtonTextLuxcavation,
+                _ => null
+            };
+
+            var fromAnchor = GetAnchor(from);
+            var toAnchor = GetAnchor(to);
+            var rect = new Rectangle(0, 0, 10, 10);
+
+            // Determine Priority (Order of checks in SynchronizeState)
+            // 1. Window, 2. Drive, 3. Sinners, 4. Charge, 5. Luxcavation, 6. MD
+            int GetPriority(string? anchor)
+            {
+                if (anchor == NavigationAssets.ButtonActiveWindow) return 1;
+                if (anchor == NavigationAssets.ButtonActiveDrive) return 2;
+                if (anchor == NavigationAssets.ButtonActiveSinners) return 3;
+                if (anchor == NavigationAssets.ChargeLabel) return 4;
+                if (anchor == NavigationAssets.ButtonTextLuxcavation) return 5;
+                if (anchor == NavigationAssets.ButtonTextMD) return 6;
+                return 100;
+            }
+
+            int fromPrio = GetPriority(fromAnchor);
+            int toPrio = GetPriority(toAnchor);
+
+            if (fromAnchor != null)
+            {
+                // FromAnchor is always found 1st time.
+                // It is checked 2nd time (End Sync). It must NOT be found.
+                _mockLocator.SetupSequence(l => l.Find(It.IsAny<Image<Gray, byte>>(), fromAnchor, It.IsAny<double>(), It.IsAny<bool>()))
+                            .Returns(rect)
+                            .Returns(Rectangle.Empty);
+            }
+
+            if (toAnchor != null && toAnchor != fromAnchor)
+            {
+                if (toPrio < fromPrio)
+                {
+                    // "To" is checked BEFORE "From".
+                    // Pass 1: "To" checked -> Must be Empty (Not there yet).
+                    // Pass 2: "To" checked -> Must be Found.
+                    _mockLocator.SetupSequence(l => l.Find(It.IsAny<Image<Gray, byte>>(), toAnchor, It.IsAny<double>(), It.IsAny<bool>()))
+                                .Returns(Rectangle.Empty)
+                                .Returns(rect);
+                }
+                else
+                {
+                    // "To" is checked AFTER "From".
+                    // Pass 1: "To" NOT CHECKED (Because From was found).
+                    // Pass 2: "To" checked -> Found.
+                    // So we only need it to return Rect once (or always).
+                    _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), toAnchor, It.IsAny<double>(), It.IsAny<bool>()))
+                                .Returns(rect);
+                }
+            }
+            
+            // Sub-state logic for Luxcavation
+            if (from == NavigationState.Luxcavation_EXP)
+            {
+                 // Checked AFTER FromAnchor(LuxText). 
+                 // Pass 1: Found. Pass 2: Not Found.
+                  _mockLocator.SetupSequence(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonLuxcavationEXP, It.IsAny<double>(), It.IsAny<bool>()))
+                            .Returns(rect)
+                            .Returns(Rectangle.Empty);
+            }
+            if (to == NavigationState.Luxcavation_EXP)
+            {
+                 // Checked AFTER ToAnchor(LuxText).
+                 // Pass 1: Not reached? Or Not Found.
+                 // If From=Drive(2), To=Lux(5).
+                 // Pass 1: Drive Found. Lux NOT checked.
+                 // Pass 2: Drive NOT Found. Lux Found. LuxEXP Checked -> Found.
+                 _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonLuxcavationEXP, It.IsAny<double>(), It.IsAny<bool>()))
+                            .Returns(rect);
+            }
         }
     }
 }

@@ -53,6 +53,14 @@ namespace Charon.Logic.Navigation
                 case NavigationState.Charge_Modules:
                 case NavigationState.Charge_Lunacy:
                     return NavigateFromCharge(target);
+
+                 case NavigationState.Luxcavation_EXP:
+                 case NavigationState.Luxcavation_Thread:
+                    return NavigateFromLuxcavation(target);
+
+                 case NavigationState.MirrorDungeon:
+                 case NavigationState.MirrorDungeon_Delving:
+                    return NavigateFromMirrorDungeon(target);
             }
 
             return false;
@@ -80,6 +88,22 @@ namespace Charon.Logic.Navigation
                     _currentState = NavigationState.Charge_Lunacy;
                 else
                     _currentState = NavigationState.Charge; // Default/Parent
+            }
+            else if (!_locator.Find(screen, NavigationAssets.ButtonTextLuxcavation).IsEmpty)
+            {
+                 if (!_locator.Find(screen, NavigationAssets.ButtonLuxcavationEXP).IsEmpty)
+                    _currentState = NavigationState.Luxcavation_EXP;
+                 else if (!_locator.Find(screen, NavigationAssets.ButtonLuxcavationThread).IsEmpty)
+                    _currentState = NavigationState.Luxcavation_Thread;
+                 else
+                    _currentState = NavigationState.Unknown; // Should default to one
+            }
+            else if (!_locator.Find(screen, NavigationAssets.ButtonTextMD).IsEmpty)
+            {
+                 if (!_locator.Find(screen, NavigationAssets.MDDungeonProgress).IsEmpty)
+                    _currentState = NavigationState.MirrorDungeon_Delving;
+                 else
+                    _currentState = NavigationState.MirrorDungeon;
             }
             else
                 _currentState = NavigationState.Unknown;
@@ -129,6 +153,26 @@ namespace Charon.Logic.Navigation
                     return ClickTransition(NavigationAssets.ButtonInActiveSinners, NavigationState.Sinners);
                 case NavigationState.Charge:
                     return ClickTransition(NavigationAssets.EnkephalinBox, NavigationState.Charge);
+                
+                case NavigationState.Luxcavation_EXP:
+                case NavigationState.Luxcavation_Thread:
+                    // Enter Luxcavation first
+                    if (_clicker.ClickTemplate(NavigationAssets.ButtonLuxcavation))
+                    {
+                         Thread.Sleep(500);
+                         SynchronizeState();
+                         if (_currentState == NavigationState.Luxcavation_EXP || _currentState == NavigationState.Luxcavation_Thread)
+                             return NavigateTo(target);
+                    }
+                    return false;
+
+                case NavigationState.MirrorDungeon:
+                case NavigationState.MirrorDungeon_Delving:
+                     if (ClickTransition(NavigationAssets.ButtonMirrorDungeon, NavigationState.MirrorDungeon))
+                     {
+                         return NavigateTo(target);
+                     }
+                     return false;
             }
             return false;
         }
@@ -162,6 +206,35 @@ namespace Charon.Logic.Navigation
                     // Recursive call to navigate from where we landed (likely Window)
                     return NavigateTo(target);
                 }
+            }
+
+            return false;
+        }
+
+        private bool NavigateFromLuxcavation(NavigationState target)
+        {
+            if (target == NavigationState.Drive)
+                return ClickTransition(NavigationAssets.ButtonBack, NavigationState.Drive);
+            
+            // Toggle between EXP/Thread
+            if (target == NavigationState.Luxcavation_EXP)
+                return ClickTransition(NavigationAssets.ButtonLuxcavationEXP, NavigationState.Luxcavation_EXP);
+            
+            if (target == NavigationState.Luxcavation_Thread)
+                return ClickTransition(NavigationAssets.ButtonLuxcavationThread, NavigationState.Luxcavation_Thread);
+
+            return false;
+        }
+
+        private bool NavigateFromMirrorDungeon(NavigationState target)
+        {
+            if (target == NavigationState.Drive)
+                 return ClickTransition(NavigationAssets.ButtonBack, NavigationState.Drive);
+            
+            if (target == NavigationState.MirrorDungeon_Delving)
+            {
+                 // We need to click "Enter" or "Resume"
+                 return ClickTransition(NavigationAssets.MDDungeonProgress, NavigationState.MirrorDungeon_Delving); 
             }
 
             return false;

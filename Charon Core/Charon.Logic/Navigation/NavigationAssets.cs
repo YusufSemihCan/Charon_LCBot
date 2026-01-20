@@ -58,6 +58,7 @@
         public const string ButtonLuxcavationEXP = "Button_Luxcavation_EXP";       // Added for toggle
         public const string ButtonLuxcavationThread = "Button_Luxcavation_Thread"; // Added for toggle
         
+        public const string ButtonMirrorDungeon = "Button_MirrorDungeon";
         public const string ButtonMDEnter = "Button_MD_Enter";
         public const string ButtonTextMDEnter = "Button_Text_MD_Enter";
         public const string ButtonTextMD = "Button_Text_MD";

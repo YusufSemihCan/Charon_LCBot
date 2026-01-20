@@ -77,7 +77,11 @@ namespace Charon.Vision
                 }
             }
 
-            return new MatchResult { Name = bestMatchName, Score = bestMatchScore, IsMatch = bestMatchScore >= threshold };
+            return new MatchResult { 
+                Name = bestMatchScore >= threshold ? bestMatchName : "Unknown", 
+                Score = bestMatchScore, 
+                IsMatch = bestMatchScore >= threshold 
+            };
         }
 
         // CLASSIFY (GRAY)
@@ -103,7 +107,11 @@ namespace Charon.Vision
                 }
             }
 
-            return new MatchResult { Name = bestMatchName, Score = bestMatchScore, IsMatch = bestMatchScore >= threshold };
+            return new MatchResult { 
+                Name = bestMatchScore >= threshold ? bestMatchName : "Unknown", 
+                Score = bestMatchScore, 
+                IsMatch = bestMatchScore >= threshold 
+            };
         }
 
         private double GetMatchScore<TColor, TDepth>(Image<TColor, TDepth> input, Image<TColor, TDepth> template)

@@ -1,0 +1,15 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Charon.Vision -> C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Vision\bin\Debug\net8.0-windows\Charon.Vision.dll
+  Charon.Input -> C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Input\bin\Debug\net8.0-windows\Charon.Input.dll
+C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs(168,59): error CS0117: 'NavigationAssets' does not contain a definition for 'ButtonMirrorDungeon' [C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Charon.Logic.csproj]
+
+Build FAILED.
+
+C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs(168,59): error CS0117: 'NavigationAssets' does not contain a definition for 'ButtonMirrorDungeon' [C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Charon.Logic.csproj]
+    0 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:01.13
+
+Workload updates are available. Run `dotnet workload list` for more information.
