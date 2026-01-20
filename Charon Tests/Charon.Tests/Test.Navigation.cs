@@ -139,6 +139,23 @@ namespace Charon.Tests
             Assert.That(success, Is.True);
         }
 
+        [Test]
+        [Description("Verifies entering MirrorDungeon Delving state via Enter button (and resulting popup).")]
+        public void NavigateTo_MirrorDungeon_Enter()
+        {
+            // Arrange
+            SetupTransition(NavigationState.MirrorDungeon, NavigationState.MirrorDungeon_Delving);
+
+            _mockClicker.Setup(c => c.ClickTemplate(NavigationAssets.ButtonMDEnter, It.IsAny<double>())).Returns(true);
+
+            // Act
+            bool success = _navigation.NavigateTo(NavigationState.MirrorDungeon_Delving);
+
+            // Assert
+            Assert.That(success, Is.True);
+            _mockClicker.Verify(c => c.ClickTemplate(NavigationAssets.ButtonMDEnter, It.IsAny<double>()), Times.Once);
+        }
+
         private void SetupTransition(NavigationState from, NavigationState to)
         {
             // Reset mocks
@@ -149,6 +166,7 @@ namespace Charon.Tests
                 NavigationState.Window => NavigationAssets.ButtonActiveWindow,
                 NavigationState.Drive => NavigationAssets.ButtonActiveDrive,
                 NavigationState.Sinners => NavigationAssets.ButtonActiveSinners,
+                NavigationState.MirrorDungeon => NavigationAssets.ButtonTextMD,
                 NavigationState.MirrorDungeon_Delving => NavigationAssets.ButtonTextMD,
                 NavigationState.Luxcavation_EXP => NavigationAssets.ButtonTextLuxcavation,
                 _ => null
@@ -204,6 +222,13 @@ namespace Charon.Tests
                                 .Returns(rect);
                 }
             }
+            else if (toAnchor != null && toAnchor == fromAnchor)
+            {
+                 // Recursive/Sub-state transition. Anchor must REMAIN found.
+                 // Overwrite the 'fromAnchor' sequence which sets it to Empty.
+                 _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), toAnchor, It.IsAny<double>(), It.IsAny<bool>()))
+                             .Returns(rect);
+            }
             
             // Sub-state logic for Luxcavation
             if (from == NavigationState.Luxcavation_EXP)
@@ -224,6 +249,71 @@ namespace Charon.Tests
                  _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonLuxcavationEXP, It.IsAny<double>(), It.IsAny<bool>()))
                             .Returns(rect);
             }
+            
+            // Sub-state logic for MirrorDungeon_Delving
+            if (from == NavigationState.MirrorDungeon_Delving)
+            {
+                 // Check MDDungeonProgress
+                 _mockLocator.SetupSequence(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.MDDungeonProgress, It.IsAny<double>(), It.IsAny<bool>()))
+                            .Returns(rect)
+                            .Returns(Rectangle.Empty);
+            }
+            if (to == NavigationState.MirrorDungeon_Delving)
+            {
+                 // Needs MDDungeonProgress
+                 // Use Sequence: Not Found (Start) -> Found (End) -> Found (Persistence)
+                 _mockLocator.SetupSequence(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.MDDungeonProgress, It.IsAny<double>(), It.IsAny<bool>()))
+                            .Returns(Rectangle.Empty)
+                            .Returns(rect)
+                            .Returns(rect)
+                            .Returns(rect);
+            }
+        }
+        
+        [Test]
+        [Description("Verifies entering MirrorDungeon Delving state via Enter button with Confirmation Popup.")]
+        public void NavigateTo_MirrorDungeon_Enter_WithConfirmation()
+        {
+            // Arrange
+            // Start at MirrorDungeon (Parent)
+            // Mock Transition:
+            // 1. Click Enter -> Confrmation Popup appears (State is still MirrorDungeon or just NOT Delving yet)
+            // 2. Click Enter again -> Delving Popup appears (State becomes Delving)
+            
+            // Setup Mocks manually for this complex sequence or enhance SetupTransition?
+            // Let's do manual for clarity as SetupTransition is getting complex.
+            
+            _mockLocator.Reset();
+            var rect = new Rectangle(0,0,10,10);
+            
+            // Sequence of States:
+            // 1. Start: MD (Text Found, Progress Empty)
+            // 2. Click 1: MD (Text Found, Progress Empty) <- Still MD, not Delving
+            // 3. Click 2: Delving (Text Found, Progress Found)
+            
+            _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonTextMD, It.IsAny<double>(), It.IsAny<bool>()))
+                        .Returns(rect); // Always in MD
+            
+            _mockLocator.SetupSequence(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.MDDungeonProgress, It.IsAny<double>(), It.IsAny<bool>()))
+                        .Returns(Rectangle.Empty) // Start
+                        .Returns(Rectangle.Empty) // After 1st Click (Confirmation Popup)
+                        .Returns(rect);       // After 2nd Click
+            
+            // Ensure other high-priority anchors are empty
+            _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonActiveWindow, It.IsAny<double>(), It.IsAny<bool>())).Returns(Rectangle.Empty);
+            _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonActiveDrive, It.IsAny<double>(), It.IsAny<bool>())).Returns(Rectangle.Empty);
+            _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonActiveSinners, It.IsAny<double>(), It.IsAny<bool>())).Returns(Rectangle.Empty);
+            _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ChargeLabel, It.IsAny<double>(), It.IsAny<bool>())).Returns(Rectangle.Empty);
+
+
+            _mockClicker.Setup(c => c.ClickTemplate(NavigationAssets.ButtonMDEnter, It.IsAny<double>())).Returns(true);
+
+            // Act
+            bool success = _navigation.NavigateTo(NavigationState.MirrorDungeon_Delving);
+
+            // Assert
+            Assert.That(success, Is.True);
+            _mockClicker.Verify(c => c.ClickTemplate(NavigationAssets.ButtonMDEnter, It.IsAny<double>()), Times.Exactly(2));
         }
     }
 }

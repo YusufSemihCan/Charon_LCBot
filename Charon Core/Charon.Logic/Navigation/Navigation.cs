@@ -233,8 +233,26 @@ namespace Charon.Logic.Navigation
             
             if (target == NavigationState.MirrorDungeon_Delving)
             {
-                 // We need to click "Enter" or "Resume"
-                 return ClickTransition(NavigationAssets.MDDungeonProgress, NavigationState.MirrorDungeon_Delving); 
+                 // Click Enter to start (or resume)
+                 if (_clicker.ClickTemplate(NavigationAssets.ButtonMDEnter))
+                 {
+                     Thread.Sleep(500); // Animation
+                     SynchronizeState();
+                     
+                     // Case 1: Progress Popup appeared (Delving)
+                     if (_currentState == NavigationState.MirrorDungeon_Delving) return true;
+                     
+                     // Case 2: Confirmation Popup appeared.
+                     // The state might still look like 'MirrorDungeon' (parent) because progress isn't up yet.
+                     // Or it might be 'Unknown' if popup obscures anchors.
+                     // Try clicking Enter again (Confirm)
+                     if (_clicker.ClickTemplate(NavigationAssets.ButtonMDEnter)) 
+                     {
+                         Thread.Sleep(500);
+                         SynchronizeState();
+                         if (_currentState == NavigationState.MirrorDungeon_Delving) return true;
+                     }
+                 }
             }
 
             return false;
