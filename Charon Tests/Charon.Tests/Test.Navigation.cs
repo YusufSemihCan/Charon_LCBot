@@ -112,13 +112,9 @@ namespace Charon.Tests
             int luxChecks = 0;
             var luxRect = new Rectangle(0,0,10,10);
             
-            // Fix: Logic uses Gray for Panels/Text
-            _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.PanelLuxcavationEXP, It.IsAny<double>(), It.IsAny<bool>()))
-                        .Returns(() => luxChecks++ < 1 ? Rectangle.Empty : luxRect);
-
-            // Text is also checked
-             _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonTextLuxcavation, It.IsAny<double>(), It.IsAny<bool>()))
-                        .Returns(() => luxChecks < 2 ? Rectangle.Empty : luxRect); // Fix: Threshold 2 because Panel check increments first
+             // Fix: Logic uses Gray/Color for active button as primary check if panel missing
+             _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonActiveLuxcavationEXP, It.IsAny<double>(), It.IsAny<bool>()))
+                         .Returns(() => luxChecks++ < 1 ? Rectangle.Empty : luxRect);
 
             _mockClicker.Setup(c => c.ClickTemplate(NavigationAssets.ButtonLuxcavation, It.IsAny<double>())).Returns(true);
             _mockClicker.Setup(c => c.ClickTemplate(NavigationAssets.ButtonLuxcavationEXP, It.IsAny<double>())).Returns(true);
@@ -141,12 +137,9 @@ namespace Charon.Tests
             int luxChecks = 0;
             var luxRect = new Rectangle(0,0,10,10);
 
-            // Fix: Logic uses Gray
-            _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.PanelLuxcavationEXP, It.IsAny<double>(), It.IsAny<bool>()))
+            // Fix: Logic uses Gray/Color
+            _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonActiveLuxcavationEXP, It.IsAny<double>(), It.IsAny<bool>()))
                         .Returns(() => luxChecks++ < 1 ? luxRect : Rectangle.Empty);
-                        
-             _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonTextLuxcavation, It.IsAny<double>(), It.IsAny<bool>()))
-                        .Returns(() => luxChecks < 1 ? luxRect : Rectangle.Empty);
             
             // End: Drive Found (Gray) - Always found (Background)
             _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonActiveDrive, It.IsAny<double>(), It.IsAny<bool>())).Returns(new Rectangle(0,0,10,10));
@@ -229,12 +222,7 @@ namespace Charon.Tests
             // Sync 1 (Start): Found.
             // Sync 2 (Post Esc): Empty.
             // Sync 3+ (Post Click Window): Empty.
-            _mockLocator.SetupSequence(l => l.Find(It.IsAny<Image<Bgr, byte>>(), NavigationAssets.PanelLuxcavationEXP, It.IsAny<double>(), It.IsAny<bool>()))
-                        .Returns(rect)
-                        .Returns(Rectangle.Empty)
-                        .Returns(Rectangle.Empty)
-                        .Returns(Rectangle.Empty);
-            _mockLocator.SetupSequence(l => l.Find(It.IsAny<Image<Bgr, byte>>(), NavigationAssets.ButtonTextLuxcavation, It.IsAny<double>(), It.IsAny<bool>()))
+            _mockLocator.SetupSequence(l => l.Find(It.IsAny<Image<Bgr, byte>>(), NavigationAssets.ButtonActiveLuxcavationEXP, It.IsAny<double>(), It.IsAny<bool>()))
                         .Returns(rect)
                         .Returns(Rectangle.Empty)
                         .Returns(Rectangle.Empty)
@@ -306,13 +294,7 @@ namespace Charon.Tests
              // Sync 1: Empty.
              // Sync 2: Empty.
              // Sync 3: Found. State=LuxEXP.
-             _mockLocator.SetupSequence(l => l.Find(It.IsAny<Image<Bgr, byte>>(), NavigationAssets.PanelLuxcavationEXP, It.IsAny<double>(), It.IsAny<bool>()))
-                         .Returns(Rectangle.Empty)
-                         .Returns(Rectangle.Empty)
-                         .Returns(rect)
-                         .Returns(rect);
-             // Ensure Text is also mocked if checked
-             _mockLocator.SetupSequence(l => l.Find(It.IsAny<Image<Bgr, byte>>(), NavigationAssets.ButtonTextLuxcavation, It.IsAny<double>(), It.IsAny<bool>()))
+             _mockLocator.SetupSequence(l => l.Find(It.IsAny<Image<Bgr, byte>>(), NavigationAssets.ButtonActiveLuxcavationEXP, It.IsAny<double>(), It.IsAny<bool>()))
                          .Returns(Rectangle.Empty)
                          .Returns(Rectangle.Empty)
                          .Returns(rect)
@@ -351,7 +333,6 @@ namespace Charon.Tests
             _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonActiveWindow, It.IsAny<double>(), It.IsAny<bool>())).Returns(Rectangle.Empty);
             _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonActiveDrive, It.IsAny<double>(), It.IsAny<bool>())).Returns(Rectangle.Empty);
             _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ButtonActiveSinners, It.IsAny<double>(), It.IsAny<bool>())).Returns(Rectangle.Empty);
-            _mockLocator.Setup(l => l.Find(It.IsAny<Image<Gray, byte>>(), NavigationAssets.ChargeLabel, It.IsAny<double>(), It.IsAny<bool>())).Returns(Rectangle.Empty);
 
 
             _mockClicker.Setup(c => c.ClickTemplate(NavigationAssets.ButtonMDEnter, It.IsAny<double>())).Returns(true);

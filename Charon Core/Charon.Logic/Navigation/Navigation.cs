@@ -80,20 +80,18 @@ namespace Charon.Logic.Navigation
             // CRITICAL: Check OVERLAY menus first. 
 
             // 1. Charge Menu (Overlay)
-            // Charge Label is likely text/high contrast, so Gray is fine, but if we need sub-tabs (Active), use Color.
-            // Let's use Color for Charge sub-tabs to be safe if they use the same yellow/grey scheme.
-            if (!_locator.Find(screenGray, NavigationAssets.ChargeLabel).IsEmpty)
-            {
-                // We are in some Charge state, check specific sub-tabs using Active Buttons (Color)
-                if (!_locator.Find(screenColor, NavigationAssets.ButtonActiveChargeBoxes).IsEmpty)
-                    _currentState = NavigationState.Charge_Boxes;
-                else if (!_locator.Find(screenColor, NavigationAssets.ButtonActiveChargeModules).IsEmpty)
-                    _currentState = NavigationState.Charge_Modules;
-                else if (!_locator.Find(screenColor, NavigationAssets.ButtonActiveChargeLunacy).IsEmpty)
-                    _currentState = NavigationState.Charge_Lunacy;
-                else
-                    _currentState = NavigationState.Charge; // Default/Parent
-            }
+            // ChargeLabel is missing. Check sub-tabs directly.
+            // Using Color for Active tabs as they are distinct.
+            if (!_locator.Find(screenColor, NavigationAssets.ButtonActiveChargeBoxes).IsEmpty)
+                _currentState = NavigationState.Charge_Boxes;
+            else if (!_locator.Find(screenColor, NavigationAssets.ButtonActiveChargeModules).IsEmpty)
+                _currentState = NavigationState.Charge_Modules;
+            else if (!_locator.Find(screenColor, NavigationAssets.ButtonActiveChargeLunacy).IsEmpty)
+                _currentState = NavigationState.Charge_Lunacy;
+            // If we see 'EnkephalinBox' maybe? No that's the button to open it.
+            // If we are in 'Charge' but no tab is active? (Unlikely)
+            
+            // 2. Mirror Dungeon Popups (Overlay)
             // 2. Mirror Dungeon Popups (Overlay)
             else if (!_locator.Find(screenGray, NavigationAssets.MDDungeonProgress).IsEmpty)
             {
@@ -116,16 +114,6 @@ namespace Charon.Logic.Navigation
             else if (!_locator.Find(screenColor, NavigationAssets.TextLuxcavationThread).IsEmpty)
                  _currentState = NavigationState.Luxcavation_Thread;
 
-            // Fallback to Panels (Gray is fine for large panels, but let's stick to Color if we have the object? No, Panels usually graphic.)
-            // Let's use Gray for panels as they are large distinct shapes.
-            else if (!_locator.Find(screenGray, NavigationAssets.PanelLuxcavationEXP).IsEmpty)
-                _currentState = NavigationState.Luxcavation_EXP;
-            else if (!_locator.Find(screenGray, NavigationAssets.PanelLuxcavationThread).IsEmpty)
-                _currentState = NavigationState.Luxcavation_Thread;
-            else if (!_locator.Find(screenGray, NavigationAssets.ButtonTextLuxcavation).IsEmpty)
-            {
-                    _currentState = NavigationState.Unknown; // Should default to one
-            }
             // 4. Main Zones (Background)
             // Use GRAYSCALE as requested for shape-based matching (Drive, Window, Sinners)
             // Checked LAST because their anchors might be visible 'behind' overlays.
@@ -158,7 +146,7 @@ namespace Charon.Logic.Navigation
                 case NavigationState.Charge_Lunacy:
                     // Charge is accessible from Window via EnkephalinBox (Window variant often same or distinct)
                     // If EnkephalinBox works:
-                    return ClickTransition(NavigationAssets.EnkephalinBox, NavigationState.Charge);
+                    return ClickTransition(NavigationAssets.EnkephalinBox, NavigationState.Charge_Modules);
 
                 // Chain Nav: Go to Drive for these
                 case NavigationState.Luxcavation_EXP:
@@ -187,7 +175,7 @@ namespace Charon.Logic.Navigation
                 case NavigationState.Charge_Boxes:
                 case NavigationState.Charge_Modules:
                 case NavigationState.Charge_Lunacy:
-                    return ClickTransition(NavigationAssets.EnkephalinBox, NavigationState.Charge);
+                    return ClickTransition(NavigationAssets.EnkephalinBox, NavigationState.Charge_Modules);
                     
                 // Chain Nav: Go to Drive for these
                 case NavigationState.Luxcavation_EXP:
@@ -213,17 +201,14 @@ namespace Charon.Logic.Navigation
                 case NavigationState.Sinners:
                     return ClickTransition(NavigationAssets.ButtonInActiveSinners, NavigationState.Sinners);
                 case NavigationState.Charge:
-                    return ClickTransition(NavigationAssets.EnkephalinBox, NavigationState.Charge);
+                    return ClickTransition(NavigationAssets.EnkephalinBox, NavigationState.Charge_Modules);
                 
                 case NavigationState.Luxcavation_EXP:
                 case NavigationState.Luxcavation_Thread:
-                    // Enter Luxcavation first
-                    if (_clicker.ClickTemplate(NavigationAssets.ButtonLuxcavation))
+                    // Enter Luxcavation first (Defaults to EXP)
+                    if (ClickTransition(NavigationAssets.ButtonLuxcavation, NavigationState.Luxcavation_EXP))
                     {
-                         Thread.Sleep(500);
-                         SynchronizeState();
-                         if (_currentState == NavigationState.Luxcavation_EXP || _currentState == NavigationState.Luxcavation_Thread)
-                             return NavigateTo(target);
+                          return NavigateTo(target);
                     }
                     return false;
 
@@ -242,31 +227,39 @@ namespace Charon.Logic.Navigation
         {
             // First, are we trying to switch sub-tabs?
             if (target == NavigationState.Charge_Boxes)
-                return ClickTransition(NavigationAssets.ChargeBoxes, NavigationState.Charge_Boxes);
+                return ClickTransition(NavigationAssets.ButtonInActiveChargeBoxes, NavigationState.Charge_Boxes);
             
             if (target == NavigationState.Charge_Modules)
-                return ClickTransition(NavigationAssets.ChargeModules, NavigationState.Charge_Modules);
+                return ClickTransition(NavigationAssets.ButtonInActiveChargeModules, NavigationState.Charge_Modules);
 
             if (target == NavigationState.Charge_Lunacy)
-                return ClickTransition(NavigationAssets.ChargeLunacy, NavigationState.Charge_Lunacy);
+                return ClickTransition(NavigationAssets.ButtonInActiveChargeLunacy, NavigationState.Charge_Lunacy);
 
             // If we are trying to leave Charge? 
-            // "Charge state which we cant get anywhere within it" implies we might be stuck or have to close it.
-            // Usually there is a close button or we click one of the main nav buttons if they are visible.
-            // Assuming Charge is an overlay:
-            if (target == NavigationState.Window || target == NavigationState.Drive || target == NavigationState.Sinners)
+            // We can return to potential Previous States: Window, Drive, Sinners, Luxcavation
+            if (target == NavigationState.Window || target == NavigationState.Drive || target == NavigationState.Sinners || 
+                target == NavigationState.Luxcavation_EXP || target == NavigationState.Luxcavation_Thread)
             {
-                // Try closing Charge first? Or if Nav bar is visible, click it.
-                // If "Charge state which we cant get anywhere within it" means it blocks nav bar, 
-                // we must close it. Usually 'ButtonCancel' or clicking outside.
-                // NavigationAssets has 'ButtonChargeCancel'.
-                if (_clicker.ClickTemplate(NavigationAssets.ButtonChargeCancel))
-                {
-                    Thread.Sleep(500);
-                    SynchronizeState();
-                    // Recursive call to navigate from where we landed (likely Window)
-                    return NavigateTo(target);
-                }
+                 // Method: 1. Try Cancel Button 2. Try ESC
+                 // "Get us back into previous state which we opened charge from" means we assume target IS that state.
+                 // We rely on SynchronizeState to tell us where we landed.
+
+                 // 1. Try Cancel
+                 if (_clicker.ClickTemplate(NavigationAssets.ButtonChargeCancel))
+                 {
+                      Thread.Sleep(500);
+                      if (SynchronizeState() == target) return true;
+                      // If Cancel led elsewhere, we continue recursive navigate or return false? 
+                      // If we are out of Charge, let's return recursive to fixpath.
+                      if (!_currentState.ToString().StartsWith("Charge")) return NavigateTo(target);
+                 }
+
+                 // 2. Try ESC (Fallback)
+                 _clicker.DismissWithEsc();
+                 Thread.Sleep(500);
+                 SynchronizeState();
+                 if (_currentState == target) return true;
+                 if (!_currentState.ToString().StartsWith("Charge")) return NavigateTo(target);
             }
 
             return false;
@@ -277,22 +270,28 @@ namespace Charon.Logic.Navigation
             // Direct access to Charge via EnkephalinBox (available in Luxcavation too)
             if (target == NavigationState.Charge || target == NavigationState.Charge_Boxes || target == NavigationState.Charge_Modules || target == NavigationState.Charge_Lunacy)
             {
-                 // Clicking EnkephalinBox usually opens Charge_Boxes (or last used?)
-                 // We will land in a Charge state, then NavigateTo(target) ensures we get to correct tab.
-                 if (_clicker.ClickTemplate(NavigationAssets.EnkephalinBox))
+                 // Rule: Luxcavation -> Charge allowed via Enkephalin.
+                 // We don't know exact sub-state we land on (Boxes vs Modules), but Rule allows 'Charge'.
+                 // Let's assume 'Charge' is the representative state for entering the menu.
+                 if (ClickTransition(NavigationAssets.EnkephalinBox, NavigationState.Charge_Modules))
                  {
-                     Thread.Sleep(500);
-                     SynchronizeState();
-                     // If we successfully entered any Charge state, we are good to proceed
-                     if (_currentState.ToString().StartsWith("Charge"))
-                        return NavigateTo(target);
+                      return NavigateTo(target);
                  }
             }
 
             // ESC Strategy: "Return to previous state"
             // Typically Luxcavation -> Drive
+            // [UPDATED] Prioritize Physical Back Button (Button_Back_Luxcavation), then ESC.
             if (target == NavigationState.Drive || target == NavigationState.Window || target == NavigationState.Sinners)
             {
+                // 1. Try Back Button
+                if (_clicker.ClickTemplate(NavigationAssets.ButtonBackLuxcavation))
+                {
+                     Thread.Sleep(500);
+                     if (SynchronizeState() == target) return true;
+                }
+
+                // 2. Try ESC (Fallback)
                 _clicker.DismissWithEsc();
                 Thread.Sleep(500);
                 var newState = SynchronizeState();
@@ -303,15 +302,15 @@ namespace Charon.Logic.Navigation
                 // If we reached Drive (from Lux), and target is Window/Sinners, we can recurse.
                 if (newState == NavigationState.Drive) return NavigateTo(target);
                 
-                // If ESC failed to move us (stuck), try ButtonBack as fallback
+                // If ESC failed to move us (stuck), try Standard ButtonBack as final fallback
                 if (newState == NavigationState.Luxcavation_EXP || newState == NavigationState.Luxcavation_Thread)
                 {
-                     return ClickTransition(NavigationAssets.ButtonBack, NavigationState.Drive) && NavigateTo(target);
+                     return ClickTransition(NavigationAssets.ButtonBackLuxcavation, NavigationState.Drive) && NavigateTo(target);
                 }
             }
 
             if (target == NavigationState.Drive) // Fallback explicit
-                return ClickTransition(NavigationAssets.ButtonBack, NavigationState.Drive);
+                return ClickTransition(NavigationAssets.ButtonBackLuxcavation, NavigationState.Drive);
             
             // Toggle between EXP/Thread using INACTIVE buttons
             if (target == NavigationState.Luxcavation_EXP)
@@ -321,7 +320,7 @@ namespace Charon.Logic.Navigation
                 return ClickTransition(NavigationAssets.ButtonInActiveLuxcavationThread, NavigationState.Luxcavation_Thread);
 
             // Chain Navigation: If target is not local, go back to Drive to find path
-            if (ClickTransition(NavigationAssets.ButtonBack, NavigationState.Drive))
+            if (ClickTransition(NavigationAssets.ButtonBackLuxcavation, NavigationState.Drive))
             {
                 return NavigateTo(target);
             }
@@ -332,7 +331,7 @@ namespace Charon.Logic.Navigation
         private bool NavigateFromMirrorDungeon(NavigationState target)
         {
             if (target == NavigationState.Drive)
-                 return ClickTransition(NavigationAssets.ButtonBack, NavigationState.Drive);
+                 return ClickTransition(NavigationAssets.ButtonBackMirrorDungeon, NavigationState.Drive);
             
             if (target == NavigationState.MirrorDungeon_Delving)
             {
@@ -365,6 +364,15 @@ namespace Charon.Logic.Navigation
 
         private bool ClickTransition(string template, NavigationState expectedNextState)
         {
+            // SAFETY: Enforce the NavigationRules graph here.
+            // If the current state is known, we must ensure moving to 'expectedNextState' is allowed.
+            if (_currentState != NavigationState.Unknown && !NavigationRules.CanTransition(_currentState, expectedNextState))
+            {
+                // This means the code is trying to do a move that is NOT defined in NavigationRules.cs
+                Console.WriteLine($"[BLOCKED] Logic attempted illegal transition: {_currentState} -> {expectedNextState}");
+                return false;
+            }
+
             if (_clicker.ClickTemplate(template))
             {
                 Thread.Sleep(500); // Wait for UI animation

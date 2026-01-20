@@ -12,8 +12,8 @@ namespace Charon.Tests
     [TestFixture]
     public class Test_Diagnostic_Drive
     {
-        private VisionService _vision;
-        private VisionLocator _locator;
+        private VisionService _vision = null!;
+        private VisionLocator _locator = null!;
 
         [SetUp]
         public void Setup()
@@ -30,19 +30,16 @@ namespace Charon.Tests
             
             // Save debug image to see what Bot sees
             string debugPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "Test Results", "Debug_Screen_Drive.png");
-            Directory.CreateDirectory(Path.GetDirectoryName(debugPath));
+            string dir = Path.GetDirectoryName(debugPath) ?? string.Empty;
+            if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
             screen.Save(debugPath);
             Console.WriteLine($"Captured Screen saved to: {debugPath}");
 
-            // Check Active Drive Button
-            double scoreActive = 0;
-            var rectActive = _locator.Find(screen, NavigationAssets.ButtonActiveDrive, 0.7, false); // Lower threshold to detect even weak matches
-            // Inspect internal match score if possible, or just deduce from success.
-            // VisionLocator.Find wraps PerformMatch. PerformMatch usually returns Rect.
-            // We can't easily get the raw score from public API unless we modify it or infer.
-            // But we can check if it found it at 0.7, 0.8, 0.9.
+            // Check Active Drive Button (Icon)
+            // Check Active Drive Button (Icon)
+            var rectActive = _locator.Find(screen, NavigationAssets.ButtonActiveDrive, 0.7, false);
             
-            Console.WriteLine($"Checking {NavigationAssets.ButtonActiveDrive}...");
+            Console.WriteLine($"Checking {NavigationAssets.ButtonActiveDrive} (ICON)...");
             if (!rectActive.IsEmpty) Console.WriteLine($"[SUCCESS] Found {NavigationAssets.ButtonActiveDrive} at {rectActive}");
             else Console.WriteLine($"[FAILURE] Did NOT find {NavigationAssets.ButtonActiveDrive} (Threshold 0.7)");
             
@@ -52,6 +49,28 @@ namespace Charon.Tests
             if (!rectInActive.IsEmpty) Console.WriteLine($"[SUCCESS] Found {NavigationAssets.ButtonInActiveDrive} at {rectInActive}");
             else Console.WriteLine($"[FAILURE] Did NOT find {NavigationAssets.ButtonInActiveDrive} (Threshold 0.7)");
             
+            // --- LUXCAVATION CHECKS ---
+            Console.WriteLine("--- Checking Luxcavation Assets ---");
+
+            // EXP (Active vs Inactive)
+            var rectLuxExpActive = _locator.Find(screen, NavigationAssets.ButtonActiveLuxcavationEXP, 0.8, false); // Higher threshold for differentiation
+            if (!rectLuxExpActive.IsEmpty) Console.WriteLine($"[SUCCESS] Found {NavigationAssets.ButtonActiveLuxcavationEXP} (Active)");
+            else Console.WriteLine($"[INFO] Did NOT find {NavigationAssets.ButtonActiveLuxcavationEXP} (Active)");
+
+            var rectLuxExpInactive = _locator.Find(screen, NavigationAssets.ButtonInActiveLuxcavationEXP, 0.8, false);
+            if (!rectLuxExpInactive.IsEmpty) Console.WriteLine($"[SUCCESS] Found {NavigationAssets.ButtonInActiveLuxcavationEXP} (Inactive)");
+            else Console.WriteLine($"[INFO] Did NOT find {NavigationAssets.ButtonInActiveLuxcavationEXP} (Inactive)");
+
+            // Thread (Active vs Inactive)
+            var rectLuxThreadActive = _locator.Find(screen, NavigationAssets.ButtonActiveLuxcavationThread, 0.8, false);
+            if (!rectLuxThreadActive.IsEmpty) Console.WriteLine($"[SUCCESS] Found {NavigationAssets.ButtonActiveLuxcavationThread} (Active)");
+            else Console.WriteLine($"[INFO] Did NOT find {NavigationAssets.ButtonActiveLuxcavationThread} (Active)");
+
+            var rectLuxThreadInactive = _locator.Find(screen, NavigationAssets.ButtonInActiveLuxcavationThread, 0.8, false);
+            if (!rectLuxThreadInactive.IsEmpty) Console.WriteLine($"[SUCCESS] Found {NavigationAssets.ButtonInActiveLuxcavationThread} (Inactive)");
+            else Console.WriteLine($"[INFO] Did NOT find {NavigationAssets.ButtonInActiveLuxcavationThread} (Inactive)");
+
+
             // Check Window Button (Reference)
             var rectWindow = _locator.Find(screen, NavigationAssets.ButtonActiveWindow, 0.7, false);
              if (!rectWindow.IsEmpty) Console.WriteLine($"[SUCCESS] Found {NavigationAssets.ButtonActiveWindow} at {rectWindow}");

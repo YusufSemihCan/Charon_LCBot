@@ -13,6 +13,16 @@ public class BotBootstrapper
         var locator = new VisionLocator(CacheMode.Balanced);
         IInputService input = new InputService();
 
+        // 1. Calculate Resolution Scale
+        // Reference Resolution: 1920x1080
+        // We scale based on HEIGHT (vertical fit is usually most important for UI)
+        double scale = vision.ScreenResolution.Height / 1080.0;
+        
+        // Safety: If something is weird (0 height), default to 1
+        if (scale <= 0) scale = 1.0;
+        
+        locator.ScaleFactor = scale;
+
         // Link physical images
         string assetsPath = PathResolver.GetNavigationAssetsPath();
         locator.IndexTemplates(assetsPath);

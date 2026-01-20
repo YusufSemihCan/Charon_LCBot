@@ -26,6 +26,8 @@ namespace Charon.Vision
         // ENGINES
         private readonly TesseractEngine? _ocrEngine;
 
+        public double ScaleFactor { get; set; } = 1.0;
+
         public VisionLocator(CacheMode mode = CacheMode.Balanced, int maxCacheSize = 20)
         {
             _mode = mode;
@@ -75,7 +77,7 @@ namespace Charon.Vision
                     // We default to Gray as it's the most common use case.
                     if (_mode == CacheMode.Speed)
                     {
-                        AddToCache(name, new Image<Gray, byte>(file));
+                        AddToCache(name, LoadAndScale<Gray, byte>(file));
                     }
                 }
             }
@@ -111,7 +113,7 @@ namespace Charon.Vision
 
             // B. LOAD FROM DISK (Slower)
             string path = _filePaths[templateName];
-            Image<Gray, byte> loadedImg = new Image<Gray, byte>(path);
+            Image<Gray, byte> loadedImg = LoadAndScale<Gray, byte>(path);
 
             // C. CACHE LOGIC
             if (_mode == CacheMode.Memory)
@@ -150,7 +152,7 @@ namespace Charon.Vision
 
             // B. LOAD FROM DISK
             string path = _filePaths[templateName];
-            Image<Bgr, byte> loadedImg = new Image<Bgr, byte>(path);
+            Image<Bgr, byte> loadedImg = LoadAndScale<Bgr, byte>(path);
 
             // C. CACHE LOGIC
             if (_mode == CacheMode.Memory)
@@ -292,6 +294,25 @@ namespace Charon.Vision
                 if (maxValues[0] >= threshold) return new Rectangle(maxLocations[0], template.Size);
             }
             return Rectangle.Empty;
+        }
+
+        private Image<TColor, TDepth> LoadAndScale<TColor, TDepth>(string path)
+            where TColor : struct, IColor
+            where TDepth : new()
+        {
+            var img = new Image<TColor, TDepth>(path);
+            
+            // If scale is effectively 1.0, don't waste CPU resizing
+            if (Math.Abs(ScaleFactor - 1.0) < 0.001) return img;
+
+            // Inter.Area is generally best for downscaling (cleaner)
+            // Inter.Linear is good for upscaling
+            // We'll use Linear as a safe default for both, or Area if shrinking.
+            var interpolation = ScaleFactor < 1.0 ? Inter.Area : Inter.Linear;
+            
+            var scaled = img.Resize(ScaleFactor, interpolation);
+            img.Dispose();
+            return scaled;
         }
 
         public void Dispose()

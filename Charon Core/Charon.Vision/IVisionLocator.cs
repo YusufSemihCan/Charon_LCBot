@@ -14,6 +14,11 @@ namespace Charon.Vision
 
     public interface IVisionLocator
     {
+        /// <summary>
+        /// Global scaling factor applied to all loaded templates (e.g. 0.66 for 720p).
+        /// </summary>
+        double ScaleFactor { get; set; }
+
         void IndexTemplates(string subFolderPath);
         void UnloadFromRam(string templateName);
         //  FIND (Fast Gray)

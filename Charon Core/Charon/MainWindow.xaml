@@ -71,6 +71,7 @@
                     <Button x:Name="BtnChargeModules" Content="Modules" Width="80" Click="BtnChargeModules_Click"/>
                     <Button x:Name="BtnChargeLunacy" Content="Lunacy" Width="80" Click="BtnChargeLunacy_Click"/>
                 </StackPanel>
+                <Button x:Name="BtnExitCharge" Content="Exit Charge (Back)" Click="BtnDrive_Click" Background="#5A2E0E" BorderBrush="#8B4500" Width="200" Margin="5"/>
                 
                 <TextBlock Text="Status" Foreground="Gray" Margin="0,15,0,5"/>
                 <Button x:Name="BtnSync" Content="Synchronize State" Click="BtnSync_Click" Width="200"/>
