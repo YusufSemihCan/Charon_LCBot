@@ -84,6 +84,22 @@ namespace Charon.Tests
         }
 
         [Test]
+        [Description("Verifies that Classify returns expected failure when no matching item is found.")]
+        public void Classify_ReturnsUnknown_WhenNoMatch()
+        {
+            // Create a Green pattern (not in library)
+            using (Bitmap inputBmp = GeneratePattern(Color.Green, "?"))
+            using (Image<Bgr, byte> input = inputBmp.ToImage<Bgr, byte>())
+            {
+                MatchResult result = _matcher.Classify(input, threshold: 0.95);
+
+                Assert.That(result.IsMatch, Is.False, "Should not match unknown item");
+                Assert.That(result.Name, Is.Not.EqualTo("RedGem"));
+                Assert.That(result.Name, Is.Not.EqualTo("BlueGem"));
+            }
+        }
+
+        [Test]
         public void Dispose_ClearsLibrary()
         {
             _matcher.Dispose();

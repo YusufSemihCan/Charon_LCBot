@@ -60,7 +60,21 @@ Verifies item classification logic.
 |-----------|-------------|
 | `Classify_Color_IdentifiesRedGem` | Verifies correct classification of a color image against the library. |
 | `Classify_Gray_IdentifiesItem` | Verifies correct classification using grayscale logic. |
+| `Classify_ReturnsUnknown_WhenNoMatch` | Verifies failure when no matching item is found. |
 | `Dispose_ClearsLibrary` | Ensures logic library clears references upon disposal. |
+
+### 5. Navigation Tests (`Test.Navigation.cs`)
+Verifies State Machine and Transitions.
+
+| Test Name | Description |
+|-----------|-------------|
+| `SynchronizeState_DetectsWindow` | Verifies detection of active window anchor. |
+| `SynchronizeState_DetectsDrive` | Verifies detection of active drive anchor. |
+| `NavigateTo_WindowToDrive` | Verifies correct button click sequence for Window -> Drive. |
+| `NavigateTo_DriveToLuxcavation` | Verifies transitions to Luxcavation and EXP toggle. |
+| `NavigateTo_HandleMDPopup` | Verifies popup interaction logic (e.g. DungeonProgress). |
+| `NavigateTo_LuxcavationToDrive` | Verifies returning to Drive from Luxcavation via Back button. |
+| `NavigateTo_MirrorDungeonToDrive` | Verifies returning to Drive from MD via Back button. |
 
 ## Running Tests
 Run via Visual Studio Test Explorer or CLI:
