@@ -40,6 +40,7 @@
         
         public const string ButtonInActiveWindow = "Button_InActive_Window";
         public const string ButtonInActiveDrive = "Button_InActive_Drive";
+        public const string ButtonTextDrive = "Button_Text_Active_Drive"; // [Updated] Matches user filename
         public const string ButtonInActiveSinners = "Button_InActive_Sinners";
 
         // --- Common UI ---
@@ -62,6 +63,10 @@
         
         public const string ButtonActiveLuxcavationThread = "Button_Active_LuxcavationThread";
         public const string ButtonInActiveLuxcavationThread = "Button_InActive_LuxcavationThread";
+
+        // [NEW] Text Anchors
+        public const string TextLuxcavationEXP = "Text_LuxcavationEXP_Stage";
+        public const string TextLuxcavationThread = "Text_LuxcavationThread_DailyBonuses";
         
         // Panels for robust state detection
         public const string PanelLuxcavationEXP = "Panel_LuxcavationEXP";

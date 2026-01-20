@@ -5,6 +5,10 @@
 
 ## Test Suite Details
 
+### Folder Structure
+- **Test Assets/**: Contains mock assets for diagnostic tests.
+- **Test Results/**: Destination for test logs, screenshots, (`.trx`, `.txt`), and diagnostic output.
+
 ### 1. VisionLocator Tests (`Test.VisionLocator.cs`)
 Verifies image recognition, OCR accuracy, and memory management.
 

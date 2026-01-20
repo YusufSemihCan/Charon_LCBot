@@ -46,27 +46,35 @@
         <ScrollViewer Grid.Row="1">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" Margin="20">
                 <TextBlock Text="Main Menu" Foreground="Gray" Margin="0,10,0,5"/>
-                <Button x:Name="BtnWindow" Content="Navigate to Window (Home)" Click="BtnWindow_Click"/>
-                <Button x:Name="BtnDrive" Content="Navigate to Drive" Click="BtnDrive_Click"/>
-                <Button x:Name="BtnSinners" Content="Navigate to Sinners" Click="BtnSinners_Click"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button x:Name="BtnWindow" Content="Window" Width="100" Click="BtnWindow_Click"/>
+                    <Button x:Name="BtnDrive" Content="Drive" Width="100" Click="BtnDrive_Click"/>
+                    <Button x:Name="BtnSinners" Content="Sinners" Width="100" Click="BtnSinners_Click"/>
+                </StackPanel>
 
                 <TextBlock Text="Luxcavation" Foreground="Gray" Margin="0,15,0,5"/>
-                <Button x:Name="BtnLuxEXP" Content="Luxcavation (EXP)" Click="BtnLuxEXP_Click"/>
-                <Button x:Name="BtnLuxThread" Content="Luxcavation (Thread)" Click="BtnLuxThread_Click"/>
-                <Button x:Name="BtnBackFromLux" Content="Back to Drive" Click="BtnDrive_Click" Background="#5A2E0E" BorderBrush="#8B4500"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button x:Name="BtnLuxEXP" Content="EXP" Width="100" Click="BtnLuxEXP_Click"/>
+                    <Button x:Name="BtnLuxThread" Content="Thread" Width="100" Click="BtnLuxThread_Click"/>
+                </StackPanel>
+                <Button x:Name="BtnBackFromLux" Content="Back to Drive" Click="BtnDrive_Click" Background="#5A2E0E" BorderBrush="#8B4500" Width="200" Margin="5"/>
 
                 <TextBlock Text="Mirror Dungeon" Foreground="Gray" Margin="0,15,0,5"/>
-                <Button x:Name="BtnMD" Content="Mirror Dungeon (Enter)" Click="BtnMD_Click"/>
-                <Button x:Name="BtnMDDelving" Content="MD Delving (Resume)" Click="BtnMDDelving_Click"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button x:Name="BtnMD" Content="Enter" Width="100" Click="BtnMD_Click"/>
+                    <Button x:Name="BtnMDDelving" Content="Resume" Width="100" Click="BtnMDDelving_Click"/>
+                </StackPanel>
 
                 <TextBlock Text="Charge Menu" Foreground="Gray" Margin="0,15,0,5"/>
-                <Button x:Name="BtnChargeBoxes" Content="Charge (Boxes)" Click="BtnChargeBoxes_Click"/>
-                <Button x:Name="BtnChargeModules" Content="Charge (Modules)" Click="BtnChargeModules_Click"/>
-                <Button x:Name="BtnChargeLunacy" Content="Charge (Lunacy)" Click="BtnChargeLunacy_Click"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button x:Name="BtnChargeBoxes" Content="Boxes" Width="80" Click="BtnChargeBoxes_Click"/>
+                    <Button x:Name="BtnChargeModules" Content="Modules" Width="80" Click="BtnChargeModules_Click"/>
+                    <Button x:Name="BtnChargeLunacy" Content="Lunacy" Width="80" Click="BtnChargeLunacy_Click"/>
+                </StackPanel>
                 
                 <TextBlock Text="Status" Foreground="Gray" Margin="0,15,0,5"/>
-                <Button x:Name="BtnSync" Content="Synchronize State" Click="BtnSync_Click"/>
-                <TextBlock x:Name="TxtStatus" Text="State: Unknown" Foreground="#FF5555" FontWeight="Bold" Margin="5"/>
+                <Button x:Name="BtnSync" Content="Synchronize State" Click="BtnSync_Click" Width="200"/>
+                <TextBlock x:Name="TxtStatus" Text="State: Unknown" Foreground="#FF5555" FontWeight="Bold" Margin="5" HorizontalAlignment="Center"/>
             </StackPanel>
         </ScrollViewer>
         

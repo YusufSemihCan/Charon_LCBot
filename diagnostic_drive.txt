@@ -1,0 +1,23 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Charon.Vision -> C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Vision\bin\Debug\net8.0-windows\Charon.Vision.dll
+  Charon.Input -> C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Input\bin\Debug\net8.0-windows\Charon.Input.dll
+  Charon.Logic -> C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\bin\Debug\net8.0-windows\Charon.Logic.dll
+  Charon -> C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon\bin\Debug\net8.0-windows\Charon.dll
+  Charon.Tests -> C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\bin\Debug\net8.0-windows\Charon.Tests.dll
+Test run for C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\bin\Debug\net8.0-windows\Charon.Tests.dll (.NETCoreApp,Version=v8.0)
+VSTest version 17.14.1 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+Captured Screen saved to: C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\bin\Debug\net8.0-windows\Test Results\Debug_Screen_Drive.png
+Checking Button_Active_Drive...
+[FAILURE] Did NOT find Button_Active_Drive (Threshold 0.7)
+Checking Button_InActive_Drive...
+[FAILURE] Did NOT find Button_InActive_Drive (Threshold 0.7)
+[FAILURE] Did NOT find Button_Active_Window
+
+
+Passed!  - Failed:     0, Passed:     1, Skipped:     0, Total:     1, Duration: 230 ms - Charon.Tests.dll (net8.0)
+
+Workload updates are available. Run `dotnet workload list` for more information.

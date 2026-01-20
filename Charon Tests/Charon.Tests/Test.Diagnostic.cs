@@ -12,7 +12,7 @@ namespace Charon.Tests
     [TestFixture]
     public class Test_Diagnostic
     {
-        private VisionLocator _locator;
+        private VisionLocator _locator = null!;
         private string _assetsPath = @"c:\Users\cany7\source\repos\Charon [LC Bot]\Assets";
 
         [SetUp]
@@ -82,6 +82,53 @@ namespace Charon.Tests
                 
                 Assert.That(matchScore, Is.GreaterThan(0.85), $"Panel_LuxcavationThread score too low ({matchScore})");
             }
+        }
+
+
+        [Test]
+        public void Diagnose_Drive_Text()
+        {
+            string ssPath = Path.Combine(_assetsPath, "SS_DriveError.png");
+            if (!File.Exists(ssPath)) { Assert.Ignore($"Screenshot found at {ssPath}?"); return; }
+
+            using var screen = new Image<Bgr, byte>(ssPath);
+
+            // Asset found in Navigation/Text/Button_Text_Active_Drive.png
+            string textPath = Path.Combine(_assetsPath, "Navigation", "Text", NavigationAssets.ButtonTextDrive + ".png");
+             if (!File.Exists(textPath)) { Assert.Fail($"Text asset NOT found at {textPath}"); }
+
+            using var template = new Image<Bgra, byte>(textPath);
+            Console.WriteLine($"Text Asset Dims: {template.Width}x{template.Height}, Channels: {template.NumberOfChannels}");
+            
+            using var mask = template[3]; // Alpha channel
+            
+            // Fix: Use correct MinMax signature for Image class (Arrays)
+            mask.MinMax(out double[] min, out double[] max, out Point[] minLoc, out Point[] maxLoc);
+            Console.WriteLine($"Alpha Min: {min[0]}, Max: {max[0]}");
+            
+            using var tBgr = template.Convert<Bgr, byte>();
+            
+            // For now, testing Standard Matching only to avoid CS1620 on mask
+            Console.WriteLine("Using Standard Matching (CcoeffNormed)...");
+            using (Image<Gray, float> result = screen.MatchTemplate(tBgr, Emgu.CV.CvEnum.TemplateMatchingType.CcoeffNormed))
+            {
+                result.MinMax(out _, out double[] maxVal, out _, out Point[] loc);
+                Console.WriteLine($"Text Drive Score: {maxVal[0]} at {loc[0]}");
+                Assert.That(maxVal[0], Is.GreaterThan(0.50), "Text match score check (Threshold lowered for opaque test)");
+            }
+        }
+
+        [Test]
+        public void Capture_Screen_Snapshot()
+        {
+            // Helper for User: Captures the screen EXACTLY as the bot sees it.
+            // Use this to crop assets instead of Snipping Tool to avoid DPI/Resolution issues.
+            string savePath = Path.Combine(_assetsPath, "Raw_Screen_Capture.png");
+            
+            using var vision = new VisionService(); 
+            using var screen = vision.CaptureRegion(vision.ScreenResolution);
+            screen.Save(savePath);
+            Console.WriteLine($"Snapshot saved to: {savePath}");
         }
     }
 }

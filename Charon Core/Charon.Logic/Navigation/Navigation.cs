@@ -2,6 +2,8 @@
 using Charon.Vision;
 using System.Threading;
 using System;
+using Emgu.CV;
+using Emgu.CV.Structure;
 
 using Charon.Logic.Combat;
 
@@ -68,49 +70,72 @@ namespace Charon.Logic.Navigation
 
         public NavigationState SynchronizeState()
         {
-            using var screen = _vision.CaptureRegionGray(_vision.ScreenResolution);
+            // Hybrid Approach: 
+            // - Use COLOR (Bgr) for Active/Inactive tab differentiation (Luxcavation, Charge Sub-tabs)
+            // - Use GRAYSCALE for Main Menu buttons (Window, Drive, Sinners) as they rely on shape/contrast and user legacy assets are gray.
+            
+            using var screenColor = _vision.CaptureRegion(_vision.ScreenResolution);
+            using var screenGray = screenColor.Convert<Gray, byte>();
 
-            // Anchors define our state
-            if (!_locator.Find(screen, NavigationAssets.ButtonActiveWindow).IsEmpty)
-                _currentState = NavigationState.Window;
-            else if (!_locator.Find(screen, NavigationAssets.ButtonActiveDrive).IsEmpty)
-                _currentState = NavigationState.Drive;
-            else if (!_locator.Find(screen, NavigationAssets.ButtonActiveSinners).IsEmpty)
-                _currentState = NavigationState.Sinners;
-            else if (!_locator.Find(screen, NavigationAssets.ChargeLabel).IsEmpty)
+            // CRITICAL: Check OVERLAY menus first. 
+
+            // 1. Charge Menu (Overlay)
+            // Charge Label is likely text/high contrast, so Gray is fine, but if we need sub-tabs (Active), use Color.
+            // Let's use Color for Charge sub-tabs to be safe if they use the same yellow/grey scheme.
+            if (!_locator.Find(screenGray, NavigationAssets.ChargeLabel).IsEmpty)
             {
-                // We are in some Charge state, check specific sub-tabs using Active Buttons
-                if (!_locator.Find(screen, NavigationAssets.ButtonActiveChargeBoxes).IsEmpty)
+                // We are in some Charge state, check specific sub-tabs using Active Buttons (Color)
+                if (!_locator.Find(screenColor, NavigationAssets.ButtonActiveChargeBoxes).IsEmpty)
                     _currentState = NavigationState.Charge_Boxes;
-                else if (!_locator.Find(screen, NavigationAssets.ButtonActiveChargeModules).IsEmpty)
+                else if (!_locator.Find(screenColor, NavigationAssets.ButtonActiveChargeModules).IsEmpty)
                     _currentState = NavigationState.Charge_Modules;
-                else if (!_locator.Find(screen, NavigationAssets.ButtonActiveChargeLunacy).IsEmpty)
+                else if (!_locator.Find(screenColor, NavigationAssets.ButtonActiveChargeLunacy).IsEmpty)
                     _currentState = NavigationState.Charge_Lunacy;
                 else
                     _currentState = NavigationState.Charge; // Default/Parent
             }
-            else if (!_locator.Find(screen, NavigationAssets.ButtonTextLuxcavation).IsEmpty)
+            // 2. Mirror Dungeon Popups (Overlay)
+            else if (!_locator.Find(screenGray, NavigationAssets.MDDungeonProgress).IsEmpty)
             {
-                 // Use Panels for robust detection as requested
-                 if (!_locator.Find(screen, NavigationAssets.PanelLuxcavationEXP).IsEmpty)
-                    _currentState = NavigationState.Luxcavation_EXP;
-                 else if (!_locator.Find(screen, NavigationAssets.PanelLuxcavationThread).IsEmpty)
-                    _currentState = NavigationState.Luxcavation_Thread;
-                 // Fallback to Active buttons if panels fail (redundancy)
-                 else if (!_locator.Find(screen, NavigationAssets.ButtonActiveLuxcavationEXP).IsEmpty)
-                    _currentState = NavigationState.Luxcavation_EXP;
-                 else if (!_locator.Find(screen, NavigationAssets.ButtonActiveLuxcavationThread).IsEmpty)
-                    _currentState = NavigationState.Luxcavation_Thread;
-                 else
+                _currentState = NavigationState.MirrorDungeon_Delving;
+            }
+            else if (!_locator.Find(screenGray, NavigationAssets.ButtonMDInfinityMirror).IsEmpty)
+            {
+                _currentState = NavigationState.MirrorDungeon;
+            }
+            // 3. Luxcavation (Overlay/Fullscreen)
+            // Prioritize Active Buttons (Color distinct)
+            else if (!_locator.Find(screenColor, NavigationAssets.ButtonActiveLuxcavationEXP).IsEmpty)
+                _currentState = NavigationState.Luxcavation_EXP;
+            else if (!_locator.Find(screenColor, NavigationAssets.ButtonActiveLuxcavationThread).IsEmpty)
+                _currentState = NavigationState.Luxcavation_Thread;
+            
+            // Text Fallback (New Assets)
+            else if (!_locator.Find(screenColor, NavigationAssets.TextLuxcavationEXP).IsEmpty)
+                 _currentState = NavigationState.Luxcavation_EXP;
+            else if (!_locator.Find(screenColor, NavigationAssets.TextLuxcavationThread).IsEmpty)
+                 _currentState = NavigationState.Luxcavation_Thread;
+
+            // Fallback to Panels (Gray is fine for large panels, but let's stick to Color if we have the object? No, Panels usually graphic.)
+            // Let's use Gray for panels as they are large distinct shapes.
+            else if (!_locator.Find(screenGray, NavigationAssets.PanelLuxcavationEXP).IsEmpty)
+                _currentState = NavigationState.Luxcavation_EXP;
+            else if (!_locator.Find(screenGray, NavigationAssets.PanelLuxcavationThread).IsEmpty)
+                _currentState = NavigationState.Luxcavation_Thread;
+            else if (!_locator.Find(screenGray, NavigationAssets.ButtonTextLuxcavation).IsEmpty)
+            {
                     _currentState = NavigationState.Unknown; // Should default to one
             }
-            else if (!_locator.Find(screen, NavigationAssets.ButtonTextMD).IsEmpty)
-            {
-                 if (!_locator.Find(screen, NavigationAssets.MDDungeonProgress).IsEmpty)
-                    _currentState = NavigationState.MirrorDungeon_Delving;
-                 else
-                    _currentState = NavigationState.MirrorDungeon;
-            }
+            // 4. Main Zones (Background)
+            // Use GRAYSCALE as requested for shape-based matching (Drive, Window, Sinners)
+            // Checked LAST because their anchors might be visible 'behind' overlays.
+            else if (!_locator.Find(screenGray, NavigationAssets.ButtonActiveWindow).IsEmpty)
+                _currentState = NavigationState.Window;
+            else if (!_locator.Find(screenGray, NavigationAssets.ButtonActiveDrive).IsEmpty 
+                  || !_locator.Find(screenGray, NavigationAssets.ButtonTextDrive).IsEmpty) // Fallback to Text
+                _currentState = NavigationState.Drive;
+            else if (!_locator.Find(screenGray, NavigationAssets.ButtonActiveSinners).IsEmpty)
+                _currentState = NavigationState.Sinners;
             else
                 _currentState = NavigationState.Unknown;
 

@@ -1,0 +1,135 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Charon.Vision -> C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Vision\bin\Debug\net8.0-windows\Charon.Vision.dll
+  Charon.Input -> C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Input\bin\Debug\net8.0-windows\Charon.Input.dll
+  Charon.Logic -> C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\bin\Debug\net8.0-windows\Charon.Logic.dll
+  Charon -> C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon\bin\Debug\net8.0-windows\Charon.dll
+  Charon.Tests -> C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\bin\Debug\net8.0-windows\Charon.Tests.dll
+Test run for C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\bin\Debug\net8.0-windows\Charon.Tests.dll (.NETCoreApp,Version=v8.0)
+VSTest version 17.14.1 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+  Failed NavigateTo_LuxcavationToDrive [512 ms]
+  Error Message:
+   System.NullReferenceException : Object reference not set to an instance of an object.
+  Stack Trace:
+     at Emgu.CV.Image`2.get_MIplImage()
+   at Emgu.CV.Image`2.get_Size()
+   at Emgu.CV.Image`2.Convert[TOtherColor,TOtherDepth]()
+   at Charon.Logic.Navigation.Navigation.SynchronizeState() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 78
+   at Charon.Logic.Navigation.Navigation.NavigateFromLuxcavation(NavigationState target) in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 290
+   at Charon.Logic.Navigation.Navigation.NavigateTo(NavigationState target) in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 61
+   at Charon.Tests.Test_Navigation.NavigateTo_LuxcavationToDrive() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\Test.Navigation.cs:line 120
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+1)    at Emgu.CV.Image`2.get_MIplImage()
+   at Emgu.CV.Image`2.get_Size()
+   at Emgu.CV.Image`2.Convert[TOtherColor,TOtherDepth]()
+   at Charon.Logic.Navigation.Navigation.SynchronizeState() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 78
+   at Charon.Logic.Navigation.Navigation.NavigateFromLuxcavation(NavigationState target) in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 290
+   at Charon.Logic.Navigation.Navigation.NavigateTo(NavigationState target) in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 61
+   at Charon.Tests.Test_Navigation.NavigateTo_LuxcavationToDrive() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\Test.Navigation.cs:line 120
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+  Failed NavigateTo_MirrorDungeon_Enter [506 ms]
+  Error Message:
+   System.NullReferenceException : Object reference not set to an instance of an object.
+  Stack Trace:
+     at Emgu.CV.Image`2.get_MIplImage()
+   at Emgu.CV.Image`2.get_Size()
+   at Emgu.CV.Image`2.Convert[TOtherColor,TOtherDepth]()
+   at Charon.Logic.Navigation.Navigation.SynchronizeState() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 78
+   at Charon.Logic.Navigation.Navigation.NavigateFromMirrorDungeon(NavigationState target) in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 335
+   at Charon.Logic.Navigation.Navigation.NavigateTo(NavigationState target) in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 65
+   at Charon.Tests.Test_Navigation.NavigateTo_MirrorDungeon_Enter() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\Test.Navigation.cs:line 152
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+1)    at Emgu.CV.Image`2.get_MIplImage()
+   at Emgu.CV.Image`2.get_Size()
+   at Emgu.CV.Image`2.Convert[TOtherColor,TOtherDepth]()
+   at Charon.Logic.Navigation.Navigation.SynchronizeState() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 78
+   at Charon.Logic.Navigation.Navigation.NavigateFromMirrorDungeon(NavigationState target) in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 335
+   at Charon.Logic.Navigation.Navigation.NavigateTo(NavigationState target) in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 65
+   at Charon.Tests.Test_Navigation.NavigateTo_MirrorDungeon_Enter() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\Test.Navigation.cs:line 152
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+  Failed NavigateTo_MirrorDungeon_Enter_WithConfirmation [512 ms]
+  Error Message:
+   System.NullReferenceException : Object reference not set to an instance of an object.
+  Stack Trace:
+     at Emgu.CV.Image`2.get_MIplImage()
+   at Emgu.CV.Image`2.get_Size()
+   at Emgu.CV.Image`2.Convert[TOtherColor,TOtherDepth]()
+   at Charon.Logic.Navigation.Navigation.SynchronizeState() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 78
+   at Charon.Logic.Navigation.Navigation.NavigateFromMirrorDungeon(NavigationState target) in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 335
+   at Charon.Logic.Navigation.Navigation.NavigateTo(NavigationState target) in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 65
+   at Charon.Tests.Test_Navigation.NavigateTo_MirrorDungeon_Enter_WithConfirmation() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\Test.Navigation.cs:line 461
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+1)    at Emgu.CV.Image`2.get_MIplImage()
+   at Emgu.CV.Image`2.get_Size()
+   at Emgu.CV.Image`2.Convert[TOtherColor,TOtherDepth]()
+   at Charon.Logic.Navigation.Navigation.SynchronizeState() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 78
+   at Charon.Logic.Navigation.Navigation.NavigateFromMirrorDungeon(NavigationState target) in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 335
+   at Charon.Logic.Navigation.Navigation.NavigateTo(NavigationState target) in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 65
+   at Charon.Tests.Test_Navigation.NavigateTo_MirrorDungeon_Enter_WithConfirmation() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\Test.Navigation.cs:line 461
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+  Failed NavigateTo_MirrorDungeonToDrive [510 ms]
+  Error Message:
+   System.NullReferenceException : Object reference not set to an instance of an object.
+  Stack Trace:
+     at Emgu.CV.Image`2.get_MIplImage()
+   at Emgu.CV.Image`2.get_Size()
+   at Emgu.CV.Image`2.Convert[TOtherColor,TOtherDepth]()
+   at Charon.Logic.Navigation.Navigation.SynchronizeState() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 78
+   at Charon.Logic.Navigation.Navigation.ClickTransition(String template, NavigationState expectedNextState) in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 363
+   at Charon.Logic.Navigation.Navigation.NavigateFromMirrorDungeon(NavigationState target) in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 327
+   at Charon.Logic.Navigation.Navigation.NavigateTo(NavigationState target) in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 65
+   at Charon.Tests.Test_Navigation.NavigateTo_MirrorDungeonToDrive() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\Test.Navigation.cs:line 136
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+1)    at Emgu.CV.Image`2.get_MIplImage()
+   at Emgu.CV.Image`2.get_Size()
+   at Emgu.CV.Image`2.Convert[TOtherColor,TOtherDepth]()
+   at Charon.Logic.Navigation.Navigation.SynchronizeState() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 78
+   at Charon.Logic.Navigation.Navigation.ClickTransition(String template, NavigationState expectedNextState) in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 363
+   at Charon.Logic.Navigation.Navigation.NavigateFromMirrorDungeon(NavigationState target) in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 327
+   at Charon.Logic.Navigation.Navigation.NavigateTo(NavigationState target) in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 65
+   at Charon.Tests.Test_Navigation.NavigateTo_MirrorDungeonToDrive() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\Test.Navigation.cs:line 136
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+  Failed NavigateTo_WindowToDrive [510 ms]
+  Error Message:
+   System.NullReferenceException : Object reference not set to an instance of an object.
+  Stack Trace:
+     at Emgu.CV.Image`2.get_MIplImage()
+   at Emgu.CV.Image`2.get_Size()
+   at Emgu.CV.Image`2.Convert[TOtherColor,TOtherDepth]()
+   at Charon.Logic.Navigation.Navigation.SynchronizeState() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 78
+   at Charon.Logic.Navigation.Navigation.ClickTransition(String template, NavigationState expectedNextState) in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 363
+   at Charon.Logic.Navigation.Navigation.NavigateFromWindow(NavigationState target) in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 144
+   at Charon.Logic.Navigation.Navigation.NavigateTo(NavigationState target) in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 45
+   at Charon.Tests.Test_Navigation.NavigateTo_WindowToDrive() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\Test.Navigation.cs:line 87
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+1)    at Emgu.CV.Image`2.get_MIplImage()
+   at Emgu.CV.Image`2.get_Size()
+   at Emgu.CV.Image`2.Convert[TOtherColor,TOtherDepth]()
+   at Charon.Logic.Navigation.Navigation.SynchronizeState() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 78
+   at Charon.Logic.Navigation.Navigation.ClickTransition(String template, NavigationState expectedNextState) in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 363
+   at Charon.Logic.Navigation.Navigation.NavigateFromWindow(NavigationState target) in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 144
+   at Charon.Logic.Navigation.Navigation.NavigateTo(NavigationState target) in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\Navigation\Navigation.cs:line 45
+   at Charon.Tests.Test_Navigation.NavigateTo_WindowToDrive() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\Test.Navigation.cs:line 87
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+
+Failed!  - Failed:     5, Passed:     3, Skipped:     0, Total:     8, Duration: 2 s - Charon.Tests.dll (net8.0)
+
+Workload updates are available. Run `dotnet workload list` for more information.
