@@ -29,31 +29,36 @@ Managed by the `ICombatClicker` interface.
 | `Drag` | Finds two visual points (Start and End) and performs a human-like drag operation between them. |
 | `DragChain` | Follows a complex path defined by a sequence of templates. Useful for drawing patterns or navigating maps. |
 
-### 3. State Management
-The `Navigation` class maintains the current state of the bot (e.g., `Connecting`, `Window`, `Drive`). It uses the `VisionLocator` to synchronize its internal state with the actual game screen.
+### 3. State Management (`Navigation.cs`)
+The bot uses a **Graph-based State Machine** to determine how to move between menus. It identifies its current state using visual anchors (e.g., Active Buttons, Headers).
+
+#### State Graph
+- **Window (Dash)**: The central hub.
+  - -> Drive
+  - -> Sinners
+  - -> Charge
+- **Sinners**: Character management.
+  - -> Window / Drive / Charge
+- **Drive**: Mission selection hub.
+  - -> **Luxcavation**: Exp / Thread farming (Toggleable).
+  - -> **MirrorDungeon**: Dungeons (Handles entry popup).
+  - -> Window / Sinners / Charge
+- **Charge**: Action point replenishment (Overlay).
+  - -> Sub-tabs: Boxes / Modules / Lunacy.
+  - -> Exit: Via Cancel button.
+
+### 4. Asset Management
+All visual assets keys are stored in `NavigationAssets.cs`. This separates the "What to look for" (Assets) from "How to click it" (Logic).
 
 ## Usage Example
 
 ```csharp
-// Bootstrapped automatically in BotBootstrapper
-public class MyBotScript
-{
-    private readonly INavigationClicker _nav;
-    private readonly ICombatClicker _combat;
+// Simple State Transition
+_navigation.NavigateTo(NavigationState.Luxcavation_EXP);
 
-    public void Run()
-    {
-        // Menu Navigation
-        if (_nav.WaitAndClick("Btn_Inventory"))
-        {
-            _nav.TypeInto("Field_Search", "Potion");
-        }
-
-        // Gameplay Interaction
-        _combat.Drag("Item_Potion", "Slot_Quickbar1");
-        
-        // Complex Drawing
-        _combat.DragChain(new[] { "Rune_Start", "Rune_Mid", "Rune_End" });
-    }
-}
+// This automatically:
+// 1. Checks current state (e.g., Window)
+// 2. Clicks 'Drive' button
+// 3. Clicks 'Luxcavation' button
+// 4. Toggles to 'EXP' tab if needed
 ```

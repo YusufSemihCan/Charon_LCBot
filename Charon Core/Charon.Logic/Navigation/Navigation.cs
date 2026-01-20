@@ -29,88 +29,161 @@ namespace Charon.Logic.Navigation
 
         public bool NavigateTo(NavigationState target)
         {
-            _input.CheckFailSafe(); // Safety check at navigation start
+            _input.CheckFailSafe();
 
+            // 1. Identify where we are
+            SynchronizeState();
+            
             if (_currentState == target) return true;
 
-            if (_currentState == NavigationState.Connecting || target == NavigationState.Window)
+            // Navigation Tree Logic
+            switch (_currentState)
             {
-                if (!HandleConnectionAndPopups()) return false;
+                case NavigationState.Window:
+                    return NavigateFromWindow(target);
+
+                case NavigationState.Sinners:
+                    return NavigateFromSinners(target);
+
+                case NavigationState.Drive:
+                    return NavigateFromDrive(target);
+
+                case NavigationState.Charge:
+                case NavigationState.Charge_Boxes:
+                case NavigationState.Charge_Modules:
+                case NavigationState.Charge_Lunacy:
+                    return NavigateFromCharge(target);
             }
 
-            // Map-based pathfinding logic
-            return target switch
-            {
-                NavigationState.Window => true,
-                NavigationState.Charge => NavigateToWindowThenClick(NavigationAssets.BtnCharge, NavigationState.Charge),
-                NavigationState.Drive => NavigateToWindowThenClick(NavigationAssets.BtnDrive, NavigationState.Drive),
-                NavigationState.Luxcavation_EXP => NavigateToDriveThenClick(NavigationAssets.BtnLuxExp, NavigationState.Luxcavation_EXP),
-                _ => false
-            };
+            return false;
         }
 
         public NavigationState SynchronizeState()
         {
             using var screen = _vision.CaptureRegionGray(_vision.ScreenResolution);
 
-            if (!_locator.Find(screen, NavigationAssets.AnchorWindowHud).IsEmpty)
+            // Anchors define our state
+            if (!_locator.Find(screen, NavigationAssets.ButtonActiveWindow).IsEmpty)
                 _currentState = NavigationState.Window;
-            else if (!_locator.Find(screen, NavigationAssets.BtnEnterGame).IsEmpty)
-                _currentState = NavigationState.Connecting;
+            else if (!_locator.Find(screen, NavigationAssets.ButtonActiveDrive).IsEmpty)
+                _currentState = NavigationState.Drive;
+            else if (!_locator.Find(screen, NavigationAssets.ButtonActiveSinners).IsEmpty)
+                _currentState = NavigationState.Sinners;
+            else if (!_locator.Find(screen, NavigationAssets.ChargeLabel).IsEmpty)
+            {
+                // We are in some Charge state, check specific sub-windows
+                if (!_locator.Find(screen, NavigationAssets.ChargeBoxesWindow).IsEmpty)
+                    _currentState = NavigationState.Charge_Boxes;
+                else if (!_locator.Find(screen, NavigationAssets.ChargeModulesWindow).IsEmpty)
+                    _currentState = NavigationState.Charge_Modules;
+                else if (!_locator.Find(screen, NavigationAssets.ChargeLunacyWindow).IsEmpty)
+                    _currentState = NavigationState.Charge_Lunacy;
+                else
+                    _currentState = NavigationState.Charge; // Default/Parent
+            }
             else
                 _currentState = NavigationState.Unknown;
 
             return _currentState;
         }
 
-        private bool HandleConnectionAndPopups()
+        // --- State Specific Navigation Logic ---
+
+        private bool NavigateFromWindow(NavigationState target)
         {
-            int retries = 5;
-            while (retries > 0)
+            switch (target)
             {
-                _input.CheckFailSafe();
-
-                using var screen = _vision.CaptureRegionGray(_vision.ScreenResolution);
-                if (!_locator.Find(screen, NavigationAssets.AnchorWindowHud).IsEmpty) // Verify location using anchor
-                {
-                    _currentState = NavigationState.Window;
-                    return true;
-                }
-
-                if (_clicker.ClickTemplate(NavigationAssets.BtnRetryConnection) || 
-                    _clicker.ClickTemplate(NavigationAssets.BtnEnterGame))
-                {
-                    Thread.Sleep(3000);
-                }
-
-                _clicker.DismissWithEsc(); // Clear random interference
-
-                retries--;
-                Thread.Sleep(1000);
+                case NavigationState.Drive:
+                    return ClickTransition(NavigationAssets.ButtonInActiveDrive, NavigationState.Drive);
+                case NavigationState.Sinners:
+                    return ClickTransition(NavigationAssets.ButtonInActiveSinners, NavigationState.Sinners);
+                case NavigationState.Charge:
+                    return ClickTransition(NavigationAssets.EnkephalinBox, NavigationState.Charge);
             }
             return false;
         }
 
-        private bool NavigateToWindowThenClick(string template, NavigationState nextState)
+        private bool NavigateFromSinners(NavigationState target)
         {
-            if (NavigateTo(NavigationState.Window))
+            switch (target)
             {
-                if (_clicker.ClickTemplate(template))
-                {
-                    _currentState = nextState;
-                    return true;
-                }
+                // If we are in Sinners, we can use the main nav bar
+                case NavigationState.Window:
+                    return ClickTransition(NavigationAssets.ButtonInActiveWindow, NavigationState.Window);
+                case NavigationState.Drive:
+                    return ClickTransition(NavigationAssets.ButtonInActiveDrive, NavigationState.Drive);
+                case NavigationState.Charge:
+                    return ClickTransition(NavigationAssets.EnkephalinBox, NavigationState.Charge);
             }
             return false;
         }
 
-        private bool NavigateToDriveThenClick(string template, NavigationState nextState)
+        private bool NavigateFromDrive(NavigationState target)
         {
-            if (NavigateTo(NavigationState.Drive))
+            switch (target)
             {
-                if (_clicker.ClickTemplate(template))
+                // If we are in Drive, we can use the main nav bar
+                case NavigationState.Window:
+                    return ClickTransition(NavigationAssets.ButtonInActiveWindow, NavigationState.Window);
+                case NavigationState.Sinners:
+                    return ClickTransition(NavigationAssets.ButtonInActiveSinners, NavigationState.Sinners);
+                case NavigationState.Charge:
+                    return ClickTransition(NavigationAssets.EnkephalinBox, NavigationState.Charge);
+            }
+            return false;
+        }
+
+        private bool NavigateFromCharge(NavigationState target)
+        {
+            // First, are we trying to switch sub-tabs?
+            if (target == NavigationState.Charge_Boxes)
+                return ClickTransition(NavigationAssets.ChargeBoxes, NavigationState.Charge_Boxes);
+            
+            if (target == NavigationState.Charge_Modules)
+                return ClickTransition(NavigationAssets.ChargeModules, NavigationState.Charge_Modules);
+
+            if (target == NavigationState.Charge_Lunacy)
+                return ClickTransition(NavigationAssets.ChargeLunacy, NavigationState.Charge_Lunacy);
+
+            // If we are trying to leave Charge? 
+            // "Charge state which we cant get anywhere within it" implies we might be stuck or have to close it.
+            // Usually there is a close button or we click one of the main nav buttons if they are visible.
+            // Assuming Charge is an overlay:
+            if (target == NavigationState.Window || target == NavigationState.Drive || target == NavigationState.Sinners)
+            {
+                // Try closing Charge first? Or if Nav bar is visible, click it.
+                // If "Charge state which we cant get anywhere within it" means it blocks nav bar, 
+                // we must close it. Usually 'ButtonCancel' or clicking outside.
+                // NavigationAssets has 'ButtonChargeCancel'.
+                if (_clicker.ClickTemplate(NavigationAssets.ButtonChargeCancel))
                 {
-                    _currentState = nextState;
+                    Thread.Sleep(500);
+                    SynchronizeState();
+                    // Recursive call to navigate from where we landed (likely Window)
+                    return NavigateTo(target);
+                }
+            }
+
+            return false;
+        }
+
+        // --- Helpers ---
+
+        private bool ClickTransition(string template, NavigationState expectedNextState)
+        {
+            if (_clicker.ClickTemplate(template))
+            {
+                Thread.Sleep(500); // Wait for UI animation
+                SynchronizeState(); // Verify new state
+                
+                // If we entered a sub-menu (like Charge) that might not have a main anchor, assume success if Unknown?
+                // For now, strict check.
+                if (_currentState == expectedNextState) return true;
+                
+                // Handle overlay cases (e.g. Charge might overlay Window)
+                if (expectedNextState == NavigationState.Charge && _currentState != NavigationState.Unknown)
+                {
+                    _currentState = NavigationState.Charge; // Forced assumption for overlays
                     return true;
                 }
             }
