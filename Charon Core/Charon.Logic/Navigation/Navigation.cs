@@ -79,21 +79,27 @@ namespace Charon.Logic.Navigation
                 _currentState = NavigationState.Sinners;
             else if (!_locator.Find(screen, NavigationAssets.ChargeLabel).IsEmpty)
             {
-                // We are in some Charge state, check specific sub-windows
-                if (!_locator.Find(screen, NavigationAssets.ChargeBoxesWindow).IsEmpty)
+                // We are in some Charge state, check specific sub-tabs using Active Buttons
+                if (!_locator.Find(screen, NavigationAssets.ButtonActiveChargeBoxes).IsEmpty)
                     _currentState = NavigationState.Charge_Boxes;
-                else if (!_locator.Find(screen, NavigationAssets.ChargeModulesWindow).IsEmpty)
+                else if (!_locator.Find(screen, NavigationAssets.ButtonActiveChargeModules).IsEmpty)
                     _currentState = NavigationState.Charge_Modules;
-                else if (!_locator.Find(screen, NavigationAssets.ChargeLunacyWindow).IsEmpty)
+                else if (!_locator.Find(screen, NavigationAssets.ButtonActiveChargeLunacy).IsEmpty)
                     _currentState = NavigationState.Charge_Lunacy;
                 else
                     _currentState = NavigationState.Charge; // Default/Parent
             }
             else if (!_locator.Find(screen, NavigationAssets.ButtonTextLuxcavation).IsEmpty)
             {
-                 if (!_locator.Find(screen, NavigationAssets.ButtonLuxcavationEXP).IsEmpty)
+                 // Use Panels for robust detection as requested
+                 if (!_locator.Find(screen, NavigationAssets.PanelLuxcavationEXP).IsEmpty)
                     _currentState = NavigationState.Luxcavation_EXP;
-                 else if (!_locator.Find(screen, NavigationAssets.ButtonLuxcavationThread).IsEmpty)
+                 else if (!_locator.Find(screen, NavigationAssets.PanelLuxcavationThread).IsEmpty)
+                    _currentState = NavigationState.Luxcavation_Thread;
+                 // Fallback to Active buttons if panels fail (redundancy)
+                 else if (!_locator.Find(screen, NavigationAssets.ButtonActiveLuxcavationEXP).IsEmpty)
+                    _currentState = NavigationState.Luxcavation_EXP;
+                 else if (!_locator.Find(screen, NavigationAssets.ButtonActiveLuxcavationThread).IsEmpty)
                     _currentState = NavigationState.Luxcavation_Thread;
                  else
                     _currentState = NavigationState.Unknown; // Should default to one
@@ -122,7 +128,23 @@ namespace Charon.Logic.Navigation
                 case NavigationState.Sinners:
                     return ClickTransition(NavigationAssets.ButtonInActiveSinners, NavigationState.Sinners);
                 case NavigationState.Charge:
+                case NavigationState.Charge_Boxes:
+                case NavigationState.Charge_Modules:
+                case NavigationState.Charge_Lunacy:
+                    // Charge is accessible from Window via EnkephalinBox (Window variant often same or distinct)
+                    // If EnkephalinBox works:
                     return ClickTransition(NavigationAssets.EnkephalinBox, NavigationState.Charge);
+
+                // Chain Nav: Go to Drive for these
+                case NavigationState.Luxcavation_EXP:
+                case NavigationState.Luxcavation_Thread:
+                case NavigationState.MirrorDungeon:
+                case NavigationState.MirrorDungeon_Delving:
+                     if (ClickTransition(NavigationAssets.ButtonInActiveDrive, NavigationState.Drive))
+                     {
+                         return NavigateTo(target);
+                     }
+                     return false;
             }
             return false;
         }
@@ -137,7 +159,21 @@ namespace Charon.Logic.Navigation
                 case NavigationState.Drive:
                     return ClickTransition(NavigationAssets.ButtonInActiveDrive, NavigationState.Drive);
                 case NavigationState.Charge:
+                case NavigationState.Charge_Boxes:
+                case NavigationState.Charge_Modules:
+                case NavigationState.Charge_Lunacy:
                     return ClickTransition(NavigationAssets.EnkephalinBox, NavigationState.Charge);
+                    
+                // Chain Nav: Go to Drive for these
+                case NavigationState.Luxcavation_EXP:
+                case NavigationState.Luxcavation_Thread:
+                case NavigationState.MirrorDungeon:
+                case NavigationState.MirrorDungeon_Delving:
+                     if (ClickTransition(NavigationAssets.ButtonInActiveDrive, NavigationState.Drive))
+                     {
+                         return NavigateTo(target);
+                     }
+                     return false;
             }
             return false;
         }
@@ -213,15 +249,57 @@ namespace Charon.Logic.Navigation
 
         private bool NavigateFromLuxcavation(NavigationState target)
         {
-            if (target == NavigationState.Drive)
+            // Direct access to Charge via EnkephalinBox (available in Luxcavation too)
+            if (target == NavigationState.Charge || target == NavigationState.Charge_Boxes || target == NavigationState.Charge_Modules || target == NavigationState.Charge_Lunacy)
+            {
+                 // Clicking EnkephalinBox usually opens Charge_Boxes (or last used?)
+                 // We will land in a Charge state, then NavigateTo(target) ensures we get to correct tab.
+                 if (_clicker.ClickTemplate(NavigationAssets.EnkephalinBox))
+                 {
+                     Thread.Sleep(500);
+                     SynchronizeState();
+                     // If we successfully entered any Charge state, we are good to proceed
+                     if (_currentState.ToString().StartsWith("Charge"))
+                        return NavigateTo(target);
+                 }
+            }
+
+            // ESC Strategy: "Return to previous state"
+            // Typically Luxcavation -> Drive
+            if (target == NavigationState.Drive || target == NavigationState.Window || target == NavigationState.Sinners)
+            {
+                _clicker.DismissWithEsc();
+                Thread.Sleep(500);
+                var newState = SynchronizeState();
+                
+                // If we reached target, great.
+                if (newState == target) return true;
+                
+                // If we reached Drive (from Lux), and target is Window/Sinners, we can recurse.
+                if (newState == NavigationState.Drive) return NavigateTo(target);
+                
+                // If ESC failed to move us (stuck), try ButtonBack as fallback
+                if (newState == NavigationState.Luxcavation_EXP || newState == NavigationState.Luxcavation_Thread)
+                {
+                     return ClickTransition(NavigationAssets.ButtonBack, NavigationState.Drive) && NavigateTo(target);
+                }
+            }
+
+            if (target == NavigationState.Drive) // Fallback explicit
                 return ClickTransition(NavigationAssets.ButtonBack, NavigationState.Drive);
             
-            // Toggle between EXP/Thread
+            // Toggle between EXP/Thread using INACTIVE buttons
             if (target == NavigationState.Luxcavation_EXP)
-                return ClickTransition(NavigationAssets.ButtonLuxcavationEXP, NavigationState.Luxcavation_EXP);
+                return ClickTransition(NavigationAssets.ButtonInActiveLuxcavationEXP, NavigationState.Luxcavation_EXP);
             
             if (target == NavigationState.Luxcavation_Thread)
-                return ClickTransition(NavigationAssets.ButtonLuxcavationThread, NavigationState.Luxcavation_Thread);
+                return ClickTransition(NavigationAssets.ButtonInActiveLuxcavationThread, NavigationState.Luxcavation_Thread);
+
+            // Chain Navigation: If target is not local, go back to Drive to find path
+            if (ClickTransition(NavigationAssets.ButtonBack, NavigationState.Drive))
+            {
+                return NavigateTo(target);
+            }
 
             return false;
         }

@@ -1,17 +1,18 @@
-# Charon Computer Vision Framework
+# Charon: Modular Vision Automation Framework
 
-Charon is aimed to be an efficent automated system to use computer vision to make logic decisions and act accordingly.
+> **⚠️ Educational Research Notice**  
+> This project is a Proof-of-Concept (PoC) designed to study **Computer Vision-based UI Navigation** and **Hierarchical State Machines**. It is not intended for malicious use, game exploitation, or violation of any Terms of Service.
+
+Charon is an extensible framework that uses **OpenCV (EmguCV)** for visual state detection and a decoupled logic layer to emulate reliable user interactions. Its primary goal is to demonstrate robust state synchronization in dynamic graphical environments.
+
+## ⚖ Disclaimer & Compliance
+This software is provided for **educational purposes only**.
+- **No Affiliation**: This project is not endorsed by, directly affiliated with, or sponsored by any game developers or software companies.
+- **Terms of Service**: Users are strictly responsible for ensuring their usage complies with the Terms of Service of any target application. The developers assume no liability for account actions resulting from misuse.
+- **Safety First**: The framework includes built-in fail-safes (e.g., Cursor Escape Protocol) to prevent unintended behavior.
 
 ## 🏗 Architecture
-The project follows a decoupled service architecture to ensure modularity and safety:
-* **Vision Service**: Grayscale template matching for high-efficiency state detection.
-* **Input Service**: Emulated mouse and keyboard interactions.
-* **Logic Layer**: A hierarchical state machine for environment navigation.
-
-## 🛡 Features
-* **Visual Anchors**: Robust state synchronization using unique UI identifiers.
-* **Fail-Safe Protocol**: Instant process termination if the cursor hits the global escape coordinate (0,0).
-* **Modular Assets**: Externalized template management for rapid environment mapping.
-
-## ⚖ Disclaimer
-This project is for educational and research purposes only. It is intended to demonstrate the implementation of Computer Vision in automation tasks. Users are responsible for adhering to the Terms of Service of any environment this framework interacts with.
+The project follows a clean, service-oriented architecture:
+* **Vision Service**: High-performance grayscale template matching for real-time state identification.
+* **Logic Kernel**: A State Machine capable of recursive navigation and complex decision trees.
+* **Input Abstraction**: Safe emulation of input events with human-like delays/patterns.

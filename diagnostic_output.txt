@@ -1,0 +1,45 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Charon.Vision -> C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Vision\bin\Debug\net8.0-windows\Charon.Vision.dll
+  Charon.Input -> C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Input\bin\Debug\net8.0-windows\Charon.Input.dll
+  Charon.Logic -> C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\bin\Debug\net8.0-windows\Charon.Logic.dll
+  Charon -> C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon\bin\Debug\net8.0-windows\Charon.dll
+  Charon.Tests -> C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\bin\Debug\net8.0-windows\Charon.Tests.dll
+Test run for C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\bin\Debug\net8.0-windows\Charon.Tests.dll (.NETCoreApp,Version=v8.0)
+VSTest version 17.14.1 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\bin\Debug\net8.0-windows\Charon.Tests.dll
+NUnit Adapter 4.5.0.0: Test execution started
+Running selected tests in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\bin\Debug\net8.0-windows\Charon.Tests.dll
+   NUnit3TestExecutor discovered 2 of 2 NUnit test cases using Current Discovery mode, Non-Explicit run
+Panel_LuxcavationEXP Match Score: 0.9999998211860657
+Button_Active_LuxcavationEXP Match Score: 1
+
+Panel_LuxcavationThread Match Score: 0.9999999403953552
+
+NUnit Adapter 4.5.0.0: Test execution complete
+ObjectCache(00007FFF4D658480)::~ObjectCache(): WARNING! LEAK! object 0000024A03DD1850 still has count 2 (id C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\bin\Debug\net8.0-windows\tessdata/eng.traineddatapunc-dawg)
+ObjectCache(00007FFF4D658480)::~ObjectCache(): WARNING! LEAK! object 0000024A03DD1EE0 still has count 2 (id C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\bin\Debug\net8.0-windows\tessdata/eng.traineddataword-dawg)
+ObjectCache(00007FFF4D658480)::~ObjectCache(): WARNING! LEAK! object 0000024A03DD1460 still has count 2 (id C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\bin\Debug\net8.0-windows\tessdata/eng.traineddatanumber-dawg)
+ObjectCache(00007FFF4D658480)::~ObjectCache(): WARNING! LEAK! object 0000024A03DD1380 still has count 2 (id C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\bin\Debug\net8.0-windows\tessdata/eng.traineddatabigram-dawg)
+ObjectCache(00007FFF4D658480)::~ObjectCache(): WARNING! LEAK! object 0000024A03DD12A0 still has count 2 (id C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\bin\Debug\net8.0-windows\tessdata/eng.traineddatafreq-dawg)
+  Passed Diagnose_LuxcavationEXP_Detection [338 ms]
+  Standard Output Messages:
+ Panel_LuxcavationEXP Match Score: 0.9999998211860657
+ Button_Active_LuxcavationEXP Match Score: 1
+
+
+  Passed Diagnose_LuxcavationThread_Detection [158 ms]
+  Standard Output Messages:
+ Panel_LuxcavationThread Match Score: 0.9999999403953552
+
+
+
+Test Run Successful.
+Total tests: 2
+     Passed: 2
+ Total time: 1.0335 Seconds
+
+Workload updates are available. Run `dotnet workload list` for more information.

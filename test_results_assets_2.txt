@@ -10,7 +10,7 @@ VSTest version 17.14.1 (x64)
 
 Starting test execution, please wait...
 A total of 1 test files matched the specified pattern.
-  Failed NavigateTo_DriveToLuxcavation [623 ms]
+  Failed NavigateTo_DriveToLuxcavation [610 ms]
   Error Message:
      Assert.That(success, Is.True)
   Expected: True
@@ -22,7 +22,19 @@ A total of 1 test files matched the specified pattern.
 1)    at Charon.Tests.Test_Navigation.NavigateTo_DriveToLuxcavation() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\Test.Navigation.cs:line 107
 
 
+  Failed NavigateTo_LuxcavationToDrive [3 ms]
+  Error Message:
+     Assert.That(success, Is.True)
+  Expected: True
+  But was:  False
 
-Failed!  - Failed:     1, Passed:    41, Skipped:     0, Total:    42, Duration: 5 s - Charon.Tests.dll (net8.0)
+  Stack Trace:
+     at Charon.Tests.Test_Navigation.NavigateTo_LuxcavationToDrive() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\Test.Navigation.cs:line 123
+
+1)    at Charon.Tests.Test_Navigation.NavigateTo_LuxcavationToDrive() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\Test.Navigation.cs:line 123
+
+
+
+Failed!  - Failed:     2, Passed:    40, Skipped:     0, Total:    42, Duration: 4 s - Charon.Tests.dll (net8.0)
 
 Workload updates are available. Run `dotnet workload list` for more information.

@@ -10,19 +10,24 @@ VSTest version 17.14.1 (x64)
 
 Starting test execution, please wait...
 A total of 1 test files matched the specified pattern.
-  Failed NavigateTo_DriveToLuxcavation [623 ms]
+Panel_LuxcavationEXP Match Score: 0.9999998211860657
+Button_Active_LuxcavationEXP Match Score: 1
+
+Panel_LuxcavationThread Match Score: 0.9999999403953552
+
+  Failed NavigateTo_WindowToLuxcavation [531 ms]
   Error Message:
      Assert.That(success, Is.True)
   Expected: True
   But was:  False
 
   Stack Trace:
-     at Charon.Tests.Test_Navigation.NavigateTo_DriveToLuxcavation() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\Test.Navigation.cs:line 107
+     at Charon.Tests.Test_Navigation.NavigateTo_WindowToLuxcavation() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\Test.Navigation.cs:line 397
 
-1)    at Charon.Tests.Test_Navigation.NavigateTo_DriveToLuxcavation() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\Test.Navigation.cs:line 107
+1)    at Charon.Tests.Test_Navigation.NavigateTo_WindowToLuxcavation() in C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Tests\Charon.Tests\Test.Navigation.cs:line 397
 
 
 
-Failed!  - Failed:     1, Passed:    41, Skipped:     0, Total:    42, Duration: 5 s - Charon.Tests.dll (net8.0)
+Failed!  - Failed:     1, Passed:    45, Skipped:     0, Total:    46, Duration: 7 s - Charon.Tests.dll (net8.0)
 
 Workload updates are available. Run `dotnet workload list` for more information.

@@ -10,7 +10,7 @@ VSTest version 17.14.1 (x64)
 
 Starting test execution, please wait...
 A total of 1 test files matched the specified pattern.
-  Failed NavigateTo_DriveToLuxcavation [623 ms]
+  Failed NavigateTo_DriveToLuxcavation [619 ms]
   Error Message:
      Assert.That(success, Is.True)
   Expected: True

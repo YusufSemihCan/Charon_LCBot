@@ -50,6 +50,21 @@ The bot uses a **Graph-based State Machine** to determine how to move between me
 ### 4. Asset Management
 All visual assets keys are stored in `NavigationAssets.cs`. This separates the "What to look for" (Assets) from "How to click it" (Logic).
 
+**New (v1.1): Recursive Loading**
+`VisionLocator` now recursively scans the `Assets` folder (e.g., `Assets/Navigation/Text`), allowing for organized folder structures without code changes.
+
+**Luxcavation Logic**
+Luxcavation logic now supports distinct **Active** and **Inactive** button states for robust tab detection.
+- **State Detection**: Uses `Button_Active_...` to confirm the current tab.
+- **Transition**: Clicks `Button_InActive_...` to switch tabs.
+- **Back Navigation**: Uses the generic `ButtonBack` to return to Drive.
+
+**Charge Menu Logic**
+Charge state detection relies on **Active** (Yellow) buttons to identify the current tab.
+- **Boxes/Modules/Lunacy**: Detected via `Button_Active_Charge_...`.
+- **Navigation**: Clicks `Button_InActive_Charge_...` to switch tabs.
+- **Exit**: Uses `Button_Charge_Cancel` to return to the main menu (Window/Drive) when navigating away.
+
 ## Usage Example
 
 ```csharp
@@ -59,6 +74,6 @@ _navigation.NavigateTo(NavigationState.Luxcavation_EXP);
 // This automatically:
 // 1. Checks current state (e.g., Window)
 // 2. Clicks 'Drive' button
-// 3. Clicks 'Luxcavation' button
-// 4. Toggles to 'EXP' tab if needed
+// 3. Clicks 'Luxcavation' generic button (if not in Lux)
+// 4. Toggles to 'EXP' tab if needed (using Active/Inactive logic)
 ```

@@ -1,0 +1,16 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Charon.Vision -> C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Vision\bin\Debug\net8.0-windows\Charon.Vision.dll
+  Charon.Input -> C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Input\bin\Debug\net8.0-windows\Charon.Input.dll
+  Charon.Logic -> C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon.Logic\bin\Debug\net8.0-windows\Charon.Logic.dll
+C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon\MainWindow.xaml.cs(7,17): error CS0234: The type or namespace name 'Extensions' does not exist in the namespace 'Microsoft' (are you missing an assembly reference?) [C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon\Charon.csproj]
+
+Build FAILED.
+
+C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon\MainWindow.xaml.cs(7,17): error CS0234: The type or namespace name 'Extensions' does not exist in the namespace 'Microsoft' (are you missing an assembly reference?) [C:\Users\cany7\source\repos\Charon [LC Bot]\Charon Core\Charon\Charon.csproj]
+    0 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:01.07
+
+Workload updates are available. Run `dotnet workload list` for more information.

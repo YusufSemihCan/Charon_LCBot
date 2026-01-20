@@ -55,8 +55,22 @@
         // --- Drive / ID Entry ---
         public const string ButtonLuxcavation = "Button_Luxcavation";
         public const string ButtonTextLuxcavation = "Button_Text_Luxcavation";
-        public const string ButtonLuxcavationEXP = "Button_Luxcavation_EXP";       // Added for toggle
-        public const string ButtonLuxcavationThread = "Button_Luxcavation_Thread"; // Added for toggle
+        
+        // Luxcavation Tabs
+        public const string ButtonActiveLuxcavationEXP = "Button_Active_LuxcavationEXP";
+        public const string ButtonInActiveLuxcavationEXP = "Button_InActive_LuxcavationEXP";
+        
+        public const string ButtonActiveLuxcavationThread = "Button_Active_LuxcavationThread";
+        public const string ButtonInActiveLuxcavationThread = "Button_InActive_LuxcavationThread";
+        
+        // Panels for robust state detection
+        public const string PanelLuxcavationEXP = "Panel_LuxcavationEXP";
+        public const string PanelLuxcavationThread = "Panel_LuxcavationThread";
+        
+        // Legacy keys mapped for compatibility (or update logic to use specific ones)
+        // Used for Clicking: We typically click the inactive one to switch.
+        public const string ButtonLuxcavationEXP = "Button_InActive_LuxcavationEXP";       
+        public const string ButtonLuxcavationThread = "Button_InActive_LuxcavationThread";
         
         public const string ButtonMirrorDungeon = "Button_MirrorDungeon";
         public const string ButtonMDEnter = "Button_MD_Enter";
@@ -76,13 +90,25 @@
         public const string ButtonChargeConfirm = "Button_Charge_Confirm";
         public const string ButtonChargeCancel = "Button_Charge_Cancel";
         
-        public const string ChargeBoxes = "Charge_Boxes";
         public const string ChargeBoxesWindow = "Charge_Boxes_Window";
-        public const string ChargeLunacy = "Charge_Lunacy";
-        public const string ChargeLunacyWindow = "Charge_Lunacy_Window";
-        public const string ChargeModules = "Charge_Modules";
         public const string ChargeModulesWindow = "Charge_Modules_Window";
+        public const string ChargeLunacyWindow = "Charge_Lunacy_Window";
         
+        // Active/InActive Tabs for Charge
+        public const string ButtonActiveChargeBoxes = "Button_Active_Charge_Boxes";
+        public const string ButtonInActiveChargeBoxes = "Button_InActive_Charge_Boxes";
+        
+        public const string ButtonActiveChargeModules = "Button_Active_Charge_Modules";
+        public const string ButtonInActiveChargeModules = "Button_InActive_Charge_Modules";
+        
+        public const string ButtonActiveChargeLunacy = "Button_Active_Charge_Lunacy";
+        public const string ButtonInActiveChargeLunacy = "Button_InActive_Charge_Lunacy";
+        
+        // Legacy/Generic (Can map to InActive for clicking if needed)
+        public const string ChargeBoxes = ButtonInActiveChargeBoxes;
+        public const string ChargeModules = ButtonInActiveChargeModules;
+        public const string ChargeLunacy = ButtonInActiveChargeLunacy;
+
         public const string Enkephalin = "Enkephalin";
         public const string EnkephalinBox = "EnkephalinBox";
         public const string EnkephalinNumbers = "Enkephalin_Numbers";

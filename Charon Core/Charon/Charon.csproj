@@ -10,11 +10,20 @@
 
   <ItemGroup>
     <PackageReference Include="System.Drawing.Common" Version="10.0.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Charon.Input\Charon.Input.csproj" />
     <ProjectReference Include="..\Charon.Vision\Charon.Vision.csproj" />
+    <ProjectReference Include="..\Charon.Logic\Charon.Logic.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\Assets\**\*.*">
+      <Link>Assets\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

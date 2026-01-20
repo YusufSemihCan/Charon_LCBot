@@ -1,29 +1,79 @@
 ﻿<Window x:Class="Charon.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Charon Bot - Clean UI" Height="450" Width="800">
-    <Grid Margin="10">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+        Title="Charon Bot - Navigation Test" Height="600" Width="400">
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#4A0E0E"/> <!-- Dark Red -->
+            <Setter Property="Foreground" Value="#E0E0E0"/> <!-- Light Grey -->
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="BorderBrush" Value="#8B0000"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#6D1515"/> <!-- Lighter Red -->
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#2B0505"/> <!-- Very Dark Red -->
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    
+    <Grid Background="#1E1919"> <!-- Dark Brown/Grey Background -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-        <StackPanel Grid.Column="0">
-            <Label Content="Controls" FontWeight="Bold" FontSize="14"/>
+        <TextBlock Text="CHARON NAVIGATION" FontSize="20" FontWeight="Bold" Foreground="#A03030" HorizontalAlignment="Center" Margin="10"/>
 
-            <Button Name="BtnStart" Content="Start Bot" Height="30" Margin="0,5,0,5" Click="BtnStart_Click"/>
-            <Button Name="BtnStop" Content="Stop Bot" Height="30" Margin="0,0,0,10" Click="BtnStop_Click" IsEnabled="False"/>
+        <ScrollViewer Grid.Row="1">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" Margin="20">
+                <TextBlock Text="Main Menu" Foreground="Gray" Margin="0,10,0,5"/>
+                <Button x:Name="BtnWindow" Content="Navigate to Window (Home)" Click="BtnWindow_Click"/>
+                <Button x:Name="BtnDrive" Content="Navigate to Drive" Click="BtnDrive_Click"/>
+                <Button x:Name="BtnSinners" Content="Navigate to Sinners" Click="BtnSinners_Click"/>
 
-            <Label Content="Activity Log" FontWeight="Bold" Margin="0,10,0,0"/>
-            <TextBox Name="TxtLog" Height="250" 
-                     TextWrapping="Wrap" 
-                     VerticalScrollBarVisibility="Auto" 
-                     IsReadOnly="True"
-                     Background="#F0F0F0"/>
-        </StackPanel>
+                <TextBlock Text="Luxcavation" Foreground="Gray" Margin="0,15,0,5"/>
+                <Button x:Name="BtnLuxEXP" Content="Luxcavation (EXP)" Click="BtnLuxEXP_Click"/>
+                <Button x:Name="BtnLuxThread" Content="Luxcavation (Thread)" Click="BtnLuxThread_Click"/>
+                <Button x:Name="BtnBackFromLux" Content="Back to Drive" Click="BtnDrive_Click" Background="#5A2E0E" BorderBrush="#8B4500"/>
 
-        <Border Grid.Column="1" Margin="10,0,0,0" BorderBrush="Gray" BorderThickness="1">
-            <Image Name="ImgDebugView" Stretch="Uniform"/>
-        </Border>
+                <TextBlock Text="Mirror Dungeon" Foreground="Gray" Margin="0,15,0,5"/>
+                <Button x:Name="BtnMD" Content="Mirror Dungeon (Enter)" Click="BtnMD_Click"/>
+                <Button x:Name="BtnMDDelving" Content="MD Delving (Resume)" Click="BtnMDDelving_Click"/>
+
+                <TextBlock Text="Charge Menu" Foreground="Gray" Margin="0,15,0,5"/>
+                <Button x:Name="BtnChargeBoxes" Content="Charge (Boxes)" Click="BtnChargeBoxes_Click"/>
+                <Button x:Name="BtnChargeModules" Content="Charge (Modules)" Click="BtnChargeModules_Click"/>
+                <Button x:Name="BtnChargeLunacy" Content="Charge (Lunacy)" Click="BtnChargeLunacy_Click"/>
+                
+                <TextBlock Text="Status" Foreground="Gray" Margin="0,15,0,5"/>
+                <Button x:Name="BtnSync" Content="Synchronize State" Click="BtnSync_Click"/>
+                <TextBlock x:Name="TxtStatus" Text="State: Unknown" Foreground="#FF5555" FontWeight="Bold" Margin="5"/>
+            </StackPanel>
+        </ScrollViewer>
+        
+        <StatusBar Grid.Row="2" Background="#252020" Foreground="Gray">
+            <StatusBarItem>
+                <TextBlock x:Name="TxtLog" Text="Ready"/>
+            </StatusBarItem>
+        </StatusBar>
     </Grid>
 </Window>

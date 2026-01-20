@@ -58,9 +58,9 @@ namespace Charon.Vision
             string fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, subFolderPath);
             if (!Directory.Exists(fullPath)) return;
 
-            // Scan the folder for supported image formats
+            // Scan the folder for supported image formats using AllDirectories to support subfolders
             var extensions = new[] { "*.png", "*.jpg", "*.jpeg", "*.bmp" };
-            var files = extensions.SelectMany(ext => Directory.GetFiles(fullPath, ext)).Distinct();
+            var files = extensions.SelectMany(ext => Directory.GetFiles(fullPath, ext, SearchOption.AllDirectories)).Distinct();
 
             foreach (var file in files)
             {
